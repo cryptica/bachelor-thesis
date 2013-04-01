@@ -117,9 +117,9 @@ An mPRS $(\Dmay, \Dmust)$ induces an MTS $(\mc P, \may[], \must[])$ as follows:
   An \emph{attack sequence} $(p,q) \attack_a^* S$ is given by
   \begin{mathpar}
     \inferrule{(p,q) \attack_a S}
-      {(p,q) \attack_a^* S} \, (3) \hspace{1cm}
-    \inferrule{(p,q) \attack_a^* \{(p',q')\} \uplus S \\ (p',q') \attack_a S'}
-      {(p,q) \attack_a^* S ∪ S'} \, (4)
+      {(p,q) \attack_a^* S} \, (3) \hspace{0.5cm}
+    \inferrule{(p,q) \attack_a^* \{(p',q')\} \uplus S \\ (p',q') \attack_a S' \\ S ∩ S' = ∅}
+      {(p,q) \attack_a^* S \uplus S'} \, (4)
   \end{mathpar}
   The derivation of an attack sequence $(p,q) \attack_a^o S$
   can be displayed in a linear form $( a_1, a_2, …, a_n )$
@@ -137,24 +137,22 @@ An mPRS $(\Dmay, \Dmust)$ induces an MTS $(\mc P, \may[], \must[])$ as follows:
 
 \begin{lemma}
   \label{lemma:attack-associativity}
-  If $(p, q) \attack_a^* \{ (p',q') \} \uplus S$ and $(p',q') \attack_a^* S'$,
-  then there is $T ⊆ S$ with $(p, q) \attack_a^* T ∪ S'$.
+  If $(p, q) \attack_a^* \{ (p',q') \} \uplus S$ and $(p',q') \attack_a^* S'$
+  with $S ∩ S' = ∅$,
+  then $(p, q) \attack_a^* S \uplus S'$.
 \end{lemma}
 \begin{proof}
   Proof by induction on the length of $(p',q') \attack_a^* S'$:
   \begin{enumerate}
     \item The sequence has length 1: Then
       $(p',q') \attack_a S'$ and by rule 4
-      $(p, q) \attack_a^* S ∪ S'$.
+      $(p, q) \attack_a^* S \uplus S'$.
     \item The sequence has length $n > 1$ and the induction hypothesis holds for
       any sequence of length $< n$: Then
       $(p',q') \attack_a^* \{ (p'', q'') \} \uplus S''$ and
-      $(p'',q'') \attack_a S'''$ with $S' = S'' ∪ S'''$. By induction hypothesis
-      there is $T ⊆ S$ with
-      $(p, q) \attack_a^* T ∪ (\{ (p'', q'') \} \uplus S'')$.
-      Now if $(p'', q'') ∉ T$, we get $(p, q) \attack_a^* T ∪ S'' ∪ S''' = T ∪ S'$.
-      If $(p'', q'') ∈ T$, we get $(p, q) \attack_a^* T' ∪ S'' ∪ S''' = T' ∪ S'$
-        with $T' = T ∖ \{(p'', q'') ⊆ S$
+      $(p'',q'') \attack_a S'''$ with $S' = S'' \uplus S'''$. By induction hypothesis
+      $(p, q) \attack_a^* S \uplus (\{ (p'', q'') \} \uplus S'')$ and therefore
+      $(p, q) \attack_a^* S \uplus S'' \uplus S''' = S \uplus S'$.
   \end{enumerate}
 \end{proof}
 
@@ -184,7 +182,7 @@ An mPRS $(\Dmay, \Dmust)$ induces an MTS $(\mc P, \may[], \must[])$ as follows:
         \item The sequence has length $n > 1$ and the induction hypothesis holds for
           any sequence of length $< n$. Then it was created with the inference rule 4 from
           $(p,q) \attack_a^* \{(p',q')\} \uplus S'$ and
-          $(p',q') \attack_a S''$ with $S = S' ∪ S''$.
+          $(p',q') \attack_a S''$ with $S = S' \uplus S''$.
           By the induction hypothesis we get
           $(p,q) ∈ \mc R \Rightarrow ∃(p'',q'') : (p'',q'') ∈ \{(p',q')\} \uplus S' ∧ (p'',q'') ∈ \mc R$ and
           $(p',q') ∈ \mc R \Rightarrow ∃(p''',q'''): (p''',q''') ∈ S'' ∧ (p''',q''') ∈ \mc R$.
@@ -209,7 +207,7 @@ An mPRS $(\Dmay, \Dmust)$ induces an MTS $(\mc P, \may[], \must[])$ as follows:
             $(p', q') ∈ S$ which was created from a transition $q \may[a] q'$.
             Assuming $(p',q') \attack_a^* ∅$, by
             lemma \ref{lemma:attack-associativity} we would get
-            $(p,q) \attack_a^* T ∪ ∅$ with $T ⊆ S ∖ \{p' q'\} ⊊ S$ in contradiction to the minimality
+            $(p,q) \attack_a^* S \{p' q'\} ∪ ∅ ⊊ S$ in contradiction to the minimality
             of $S$. So $¬((p',q') \attack_a^* ∅)$ and therefore $(p',q') ∈ \mc R$.
         \item If $q \must[a] q'$, by similiar argument we get a transition
           $p \must[a] p'$ for which $(p',q') ∈ \mc R$.
