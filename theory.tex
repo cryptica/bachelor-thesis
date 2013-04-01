@@ -311,9 +311,9 @@ $|p| = |q| = 2$ and for any $(p',q') ∈ S$ that $1 ≤ |p'| = |q'| ≤ 3$.
           regard the $(p'⋅P,q'⋅Q) \attack_a^* T'''$ with $T''' ⊆ S'''$.
           Then with lemma \ref{lemma:attack-associativity} we get
           that there is $T ⊆ T' ∖ \{(p',q'\} ∪ T''' ⊆ S' ∪ S''' = S$ with $(p,q) \attack_a^* T$.
-        \item It was created by rule 4 from $(p,q) \attack_b \{(p',q')\} \uplus ∅$ and
-          $(p',q') \attack_b ∅$ with $ = S' ∪ S''$.
-          Then by induction hypothesis there is $T' ⊆ \{(p',q')\} \uplus S'$ with
+        \item It was created by rule 4 from $(p,q) \attack_b \{(p',q')\} \uplus S$ and
+          $(p',q') \attack_b S'$ with $S ∪ S' = ∅$, therefore $S = ∅$ and $S' = ∅$.
+          Then by induction hypothesis we get $T'$ with $(p',q'), T' \atree$.
           $(p,q) \attack_a^* T'$ and $T'' ⊆ S''$ with $(p',q') \attack_a^* T''$.
           If $(p',q') ∉ T'$, then we get $T' ⊆ S' ⊆ S$.
           If $(p',q') ∈ T'$, then with lemma \ref{lemma:attack-associativity} we get
