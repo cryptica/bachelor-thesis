@@ -1,0 +1,125 @@
+
+We want to show:
+\begin{theorem}
+  For an mvPDA $(\Dmay, \Dmust)$ with its mPRS attack relation $\mc B$, its
+  induced mPRS induced attack relation $\mc C$,
+  its induced MTS $(\mc P, \may[], \must[])$ and the attack relation $\mc A$ of
+  the MTS:
+  \[
+    \mc A = \mc C
+  \]
+\end{theorem}
+
+\begin{proof}
+    \Rightarrow: Assume $r := ((p,q), S) ∈ \mc A$.
+    We proof that $r ∈ \mc A$ by induction on the size of the inference tree of $r$ from
+    a rule in the mPRS.
+    \begin{enumerate}
+      \item It was created by
+        \begin{mathpar}
+          \inferrule{
+            \inferrule{(p, a, p') ∈ \Dmay}{p \may[a] p'} \, (1) 
+          }
+          {((p,q), \{ (p', q') \mid q \may[a] q' \}) ∈ \mc A} \, (1) 
+        \end{mathpar}
+        And as $|p| = |q| = 2$, each we have for each $q \may[a] q'$:
+        \begin{mathpar}
+          \inferrule{(q, a, q') ∈ \Dmay}{q \may[a] q'} \, (1) 
+        \end{mathpar}
+        Then we can infer
+        \begin{mathpar}
+          \inferrule{
+            \inferrule{(p, a, p') ∈ \Dmay}
+            {((p,q), \{ (p', q') \mid (q, a, q') ∈ \Dmay \}) ∈ \mc B} \, (1) 
+          }
+          { ((p, q), \{ (p', q') \mid q \may[a] q' \}) ∈ \mc C} \, (1) 
+        \end{mathpar}
+      \item It was created by
+        \begin{mathpar}
+          \inferrule{
+            \inferrule{(q, a, q') ∈ \Dmust}{q \must[a] q'} \, (2) 
+          }
+          {((p,q), \{ (p', q') \mid p \must[a] p' \}) ∈ \mc A} \, (2) 
+        \end{mathpar}
+        Then we can infer
+        \begin{mathpar}
+          \inferrule{
+            \inferrule{(q, a, q') ∈ \Dmust}
+            {((p,q), \{ (p', q') \mid (p, a, p') ∈ \Dmust \}) ∈ \mc B} \, (2) 
+          }
+          { ((p, q), \{ (p', q') \mid p \must[a] p' \}) ∈ \mc C} \, (2) 
+        \end{mathpar}
+    \end{enumerate}
+\end{proof}
+
+\begin{definition}[mPRS induced attack relation]
+  Let $\mc B$ be the mPRS attack relation of an mPRS.
+  Then the induced attack relation $\mc C$ is
+  The \emph{mPRS attack relation} over the set of states $\mc P^2 = \mc P × \mc P$ is
+  is the relation $\mc C ⊆ \mc P × 2^{\mc P}$ given by the inference rules
+  \begin{mathpar}
+    \inferrule{((p, q), S) ∈ \mc B}{ ((p, q), S) ∈ \mc C }
+      \, (1) \\
+    \inferrule{((p, q), S) ∈ \mc C}{ (p⋅r, q⋅r), \{ (p'⋅r, q'⋅r) \mid (p',q') ∈ S \} ∈ \mc C }
+      \, (S) \\
+    \inferrule{((p, q), S) ∈ \mc C}{ (p\|r, q\|r), \{ (p'\|r, q'\|r) \mid (p',q') ∈ S \} ∈ \mc C}
+      \, (P) \\
+  \end{mathpar}
+\end{definition}
+
+As the inference chain is linear,
+for any element $c = ( (p',q'),S' ) ∈ \mc C$, we can assign a generating element
+$b = ( (p,q), S ) ∈ \mc B$. The size of the set is preserved with each rule, so
+$|S| = |S'|$ and the left-hand side can only increase in size, so
+$|p| ≤ |p'$ and $|q| ≤ |q'|$.
+For any purely sequential process we have
+$p \text{ prefix of } p'$ and
+$q \text{ prefix of } q'$ and
+Obviously $\mc B ⊆ \mc C$. % TODO
+
+
+\begin{theorem}
+  For any derivation tree for $( (P⋅S, q⋅T), ∅ )$
+  constructable out of rules from $\mc A_v$,
+  the algorithm eventually adds $( (P⋅S, q⋅T), ∅ )$ to $\mc A_v$.
+\end{theorem}
+
+\begin{proof}
+  Let $T$ be a tree for $( (P⋅S, q⋅T), ∅ )$ with all components
+  in $\mc A_v$. Proof that eventually $( (P⋅S, q⋅T), ∅ )$ is added
+  to $\mc A_v$ by induction over the size of $T$:
+  \begin{enumerate}
+    \item $|T| = 1$: Then the tree just consists of the rule
+      $( (P⋅S, q⋅T), ∅ ) ∈ \mc V$ which has already been added to $\mc A$.
+    \item $|T| > 1$: Then there exists a non-empty path of the form
+      $(\call + \internal)(\call + \internal + \return)^*$ starting at
+      the root $(P⋅S, q⋅T)$.
+      There can be no path of the form $(\return)(\call + \internal + \return)^*)$, as
+      the first return rule would result in the state $(p,q)$ from which no further rules
+      are appliable.
+
+      Especially there exists a path of the form
+      $(P⋅S,q⋅T) \attack[]^* (p'⋅S', q'⋅T') \attack[\call + \internal] (p''⋅S''⋅α, q''⋅T''⋅β)$
+        such that all edges from $(p''⋅S'', q''⋅T'')$ are return transitions.
+        This state can be found by following all call or internal transitions from the root.
+        Note that may be no transitions from the last state node if it is a leaf node.
+
+        Let $( (p'⋅S',q'⋅T'), \{(p''⋅S''⋅α, q''⋅T''⋅β)\} ∪ S'\} ∈ \mc A_v$ be the rule
+        leading to that state. As it is a call or internal rule, we have
+        $0 ≤ |α| ≤ 1$ and $0 ≤ |β| ≤ 1$
+        Also let $( (p''⋅S'',q''⋅T''), S'') ∈ \mc A_v$ be the rule leading from that state.
+        As they are all return transitions, all elements in $S''$ have the form $(p''',q''')$.
+
+        Then we can add a new rule to $\mc A_v$ by combining the two rules into
+        $(p'⋅S',q'⋅T', S' ∪ \{ (p'''⋅α,q'''⋅β) ∈ S'' \})$. This is a valid rule as
+        $|p'''⋅α| ≤ 2$ and $|q'''⋅β| ≤ 2$. With this rule, we have a derivation for
+        $( (P⋅S, q⋅T), ∅ )$ with a tree $T'$ in which these two rules are replaced by
+        the new rule. So we have $|T'| = |T| - 1$ and by induction hypothesis the
+        algorithm eventually adds $( (P⋅S, q⋅T), ∅ )$ to $\mc A_V$ 
+
+  \end{enumerate} 
+  and $T$ is a derivation tree of
+  $( (P⋅S, q⋅T), ∅ )$ %in $A$, then 
+\end{proof}
+
+

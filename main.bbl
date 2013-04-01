@@ -1,0 +1,28 @@
+\providecommand{\bysame}{\leavevmode\hbox to3em{\hrulefill}\thinspace}
+\providecommand{\MR}{\relax\ifhmode\unskip\space\fi MR }
+% \MRhref is called by the amsart/book/proc definition of \MR.
+\providecommand{\MRhref}[2]{%
+  \href{http://www.ams.org/mathscinet-getitem?mr=#1}{#2}
+}
+\providecommand{\href}[2]{#2}
+\begin{thebibliography}{BKLS09}
+
+\bibitem[BK12]{BenesK12}
+Nikola Benes and Jan Kret{\'i}nsk{\'y}, \emph{Modal process rewrite systems},
+  ICTAC (Abhik Roychoudhury and Meenakshi D'Souza, eds.), Lecture Notes in
+  Computer Science, vol. 7521, Springer, 2012, pp.~120--135.
+
+\bibitem[BKLS09]{BenesKLS09}
+Nikola Benes, Jan Kret{\'i}nsk{\'y}, Kim~Guldstrand Larsen, and Jir{\'i} Srba,
+  \emph{On determinism in modal transition systems}, Theor. Comput. Sci
+  \textbf{410} (2009), no.~41, 4026--4043.
+
+\bibitem[Esp01]{Esparza01}
+Javier Esparza, \emph{Grammars as processes}, Lecture Notes in Computer Science
+  \textbf{2300} (2001), 277--298.
+
+\bibitem[May00]{Mayr00}
+Richard Mayr, \emph{Process rewrite systems}, Inf. Comput \textbf{156} (2000),
+  no.~1-2, 264--286.
+
+\end{thebibliography}

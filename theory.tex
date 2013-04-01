@@ -1,0 +1,383 @@
+\chapter{Theory}
+
+\section{Modal process rewrite system}
+
+Modal process rewrite systems \cite{BenesK12} are a modal extension of process rewrite systems \cite{Mayr00, Esparza01}.
+They induce a modal transition systems \cite{BenesKLS09}.
+
+\section{Basic definitions}
+
+\begin{definition}[Process term]
+
+The set of process terms over a set of constants $Const$
+is given by
+\begin{mathpar}
+  \inferrule{ }{ε ∈ \mc P}\, (0) \hspace{1cm}
+  \inferrule{X ∈ Const}{X ∈ \mc P}\, (1) \\
+  \inferrule{p ∈ \mc P \\ q ∈ \mc P}{p⋅q ∈ \mc P}\, (S) \hspace{1cm}
+  \inferrule{p ∈ \mc P \\ q ∈ \mc P}{p\|q ∈ \mc P}\, (P)
+\end{mathpar}
+The processes expressions are considered modulo the usual structural congruence, i.e.
+the smallest congruence such that the operator $⋅$ is associative,
+$\|$ is associative and commutative and
+$ε$ is a unit for both $⋅$ and $\|$.
+\end{definition}
+
+Processes that can be produced just with rule 0, 1 and S, i.e. contain no $\|$,
+are called \emph{sequential processes}
+and processes that can be produced just with rule 0, 1 and P, i.e. contain no $⋅$,
+are called \emph{parallel processes}
+
+\begin{definition}[Size of a process term]
+  The size $|p|$ of a process term $p$ is inductively defined by
+  \begin{align*}
+    |ε| &= 0 \\
+    |X| &= 1 \\
+    |p⋅q| &= |p| + |q| \\
+    |p \| q| &= |p| + |q|
+  \end{align*}
+  Process terms will be denoted by lowercase letters $p,q,r,s,t,…$ while single
+  constants are denoted by uppercase letters $P,Q,R,S,T,…$.
+  %TODO Actions are denoted by $a,b,…$.
+\end{definition}
+
+\begin{definition}[Constants of a process term]
+  The set of constants $Const(p)$ appearing in a process term $p$ is inductively defined by
+  \begin{align*}
+    Const(ε) &= ∅ \\
+    Const(X) &= \{ X \} \\
+    Const(p⋅q) &= Const(p) ∪ Const(q) \\
+    Const(p\|q) &= Const(p) ∪ Const(q) \\
+  \end{align*}
+\end{definition}
+
+\section{Modal transition system}
+
+Modal transition system definition from \cite{BenesK12}:
+\begin{definition}[Modal transition system]
+A \emph{modal transition system (MTS)} over an action alphabet $Act$ is
+a triple $(\mc P, \may[], \must[])$ where $\mc P$ is a set of processes and
+$\must[] ⊆ \may[] ⊆ \mc P × Act × \mc P$.
+An element $(p,a,q) ∈ \may[]$ is a \emph{may transition}, also written as $p \may[a] q$,
+and an element $(p,a,q) ∈ \must[]$ is a \emph{must transition}, also written as $p \must[a] q$.
+\end{definition}
+
+
+\section{Modal process rewrite system}
+
+\begin{definition}[Modal process rewrite system]
+A \emph{process rewrite system (PRS)} over a set of constants $Const$ and action
+alphabet $Act$ is a finite relation.
+$Δ ⊆ \mc P × Act × \mc P$, elements of which are called \emph{rewrite rules}.
+A \emph{modal process rewrite system (mPRS)} is a tuple $(\Dmay, \Dmust)$ where
+$\Dmay, \Dmust$ are process rewrite systems such that $\Dmay ⊆ \Dmust$.
+
+An mPRS $(\Dmay, \Dmust)$ induces an MTS $(\mc P, \may[], \must[])$ as follows:
+\begin{mathpar}
+  \inferrule{(p, a, p') ∈ \Dmay}{p \may[a] p'} \, (1) \quad
+  \inferrule{(p, a, p') ∈ \Dmust}{p \must[a] p'} \, (2) \\
+  \inferrule{p \may[a] p'}{p⋅q \may[a] p⋅q} \, (3) \quad
+  \inferrule{p \must[a] p'}{p⋅q \must[a] p'⋅q} \, (4) \quad
+  \inferrule{p \may[a] p'}{p\|q \may[a] p\|q} \, (5) \quad
+  \inferrule{p \must[a] p'}{p\|q \must[a] p'\|q} \, (6)
+\end{mathpar}
+\end{definition}
+
+\section{Modal refinement}
+
+\begin{definition}[Refinement]
+  Let $(\mc P, \may, \must)$ be an MTS
+  and $p,q ∈ \mc P$ be processes.
+  We say that $p$ \emph{refines} $q$, written $p ≤_m q$, if there is a relation
+  $\mc R ⊆ \mc P × \mc P $ such that
+  $(p, q) ∈ \mc R$ and for every $(p, q) ∈ \mc R$ and every $a ∈ Act$:
+  \begin{enumerate}
+    \item If $p \may[a] p'$ then there is a transition $q \may[a] q'$ s.t.
+          $(p',q') ∈ \mc R$.
+    \item If $q \must[a] q'$ then there is a transition $p \must[a] p'$ s.t.
+          $(p',q') ∈ \mc R$.
+  \end{enumerate}
+\end{definition}
+
+% modal refinement of two MTS
+
+\section{Attack sequences}
+
+\begin{definition}[Attack transition and attack sequence]
+  Let $(\mc P, \may, \must)$ be an MTS.
+  An \emph{attack transition} is a tupel $((p,q), S)$ with $(p,q) ∈ \mc P^2 = \mc P × \mc P$
+  and $S ⊆ \mc P$, also written as $(p,q) \attack_a S$.
+  For $p,q ∈ \mc P$, the attack transitions are given by
+  \begin{mathpar}
+    \inferrule{p \may[a] p'}{(p,q) \attack_a \{ (p', q') \mid q \may[a] q' \}}
+    \, (1) \hspace{1cm}
+    \inferrule{q \must[a] q'}{(p,q) \attack_a \{ (p', q') \mid p \must[a] p' \}}
+      \, (2) \\
+  \end{mathpar}
+  An \emph{attack sequence} $(p,q) \attack_a^* S$ is given by
+  \begin{mathpar}
+    \inferrule{(p,q) \attack_a S}
+      {(p,q) \attack_a^* S} \, (3) \hspace{1cm}
+    \inferrule{(p,q) \attack_a^* \{(p',q')\} \uplus S \\ (p',q') \attack_a S'}
+      {(p,q) \attack_a^* S ∪ S'} \, (4)
+  \end{mathpar}
+  The derivation of an attack sequence $(p,q) \attack_a^o S$
+  can be displayed in a linear form $( a_1, a_2, …, a_n )$
+  consisting of attack transitions $a_i$ with $a_1 = ((p,q), S')$ by following the
+  linear inference chain. The length of an attack sequence is the number of
+  inference rules applied to obtain it. An attack transition is also a sequence of length 1.
+
+  Intuitively, an attack transition $(p,q) \attack_a S$ means that from  
+  the state $(p,q)$, there is a sequence of \emph{attack transitions}, that is 
+  a may transition from the left side or a must transition from the right side,
+  such that $S$ is the set of reachable states by applying
+  appropriate \emph{defending transition}, that is a transition of the same type and
+  with the same action symbol from the other side.
+\end{definition}
+
+\begin{lemma}
+  \label{lemma:attack-associativity}
+  If $(p, q) \attack_a^* \{ (p',q') \} \uplus S$ and $(p',q') \attack_a^* S'$,
+  then there is $T ⊆ S$ with $(p, q) \attack_a^* T ∪ S'$.
+\end{lemma}
+\begin{proof}
+  Proof by induction on the length of $(p',q') \attack_a^* S'$:
+  \begin{enumerate}
+    \item The sequence has length 1: Then
+      $(p',q') \attack_a S'$ and by rule 4
+      $(p, q) \attack_a^* S ∪ S'$.
+    \item The sequence has length $n > 1$ and the induction hypothesis holds for
+      any sequence of length $< n$: Then
+      $(p',q') \attack_a^* \{ (p'', q'') \} \uplus S''$ and
+      $(p'',q'') \attack_a S'''$ with $S' = S'' ∪ S'''$. By induction hypothesis
+      there is $T ⊆ S$ with
+      $(p, q) \attack_a^* T ∪ (\{ (p'', q'') \} \uplus S'')$.
+      Now if $(p'', q'') ∉ T$, we get $(p, q) \attack_a^* T ∪ S'' ∪ S''' = T ∪ S'$.
+      If $(p'', q'') ∈ T$, we get $(p, q) \attack_a^* T' ∪ S'' ∪ S''' = T' ∪ S'$
+        with $T' = T ∖ \{(p'', q'') ⊆ S$
+  \end{enumerate}
+\end{proof}
+
+\begin{theorem}
+  \label{theorem:attack-refinement}
+  For an MTS $(\mc P, \may, \must)$ and processes $p,q ∈ \mc P$:
+  \[
+    (p ≤_m q) \iff ¬((p,q) \attack_a^* ∅)
+  \]
+\end{theorem}
+
+\begin{proof}
+    \Rightarrow: Assume $p ≤_m q$. Then there is a refinement relation $\mc R$.
+      We show that for any $(p, q) \attack_a^* S$ that
+      $(p,q) ∈ \mc R \Rightarrow ∃ (p',q') : (p',q') ∈ \mc S ∧ (p',q') ∈ \mc R$
+      by induction on the length of the attack sequence $(p, q) \attack_a^* S$:
+      \begin{enumerate}
+        \item The sequence has length 1: Then it is an attack transition created by rule 1 or 2.
+        \begin{enumerate}
+          \item If it was created with the inference rule 1 from $p \may[a] p'$.
+            If $(p,q) ∈ \mc R$ we get by refinement that there is a transition
+            $q \may[a] q'$ with $(p',q') ∈ \mc R$ and therefore $(p',q') ∈ S $.
+          \item If it was created with the inference rule 2 from $q \must[a] q'$.
+            If $(p,q) ∈ \mc R$ we get by refinement that there is a transition
+            $p \must[a] p'$, with $(p',q') ∈ \mc R$ and $(p',q') ∈ S$.
+        \end{enumerate}
+        \item The sequence has length $n > 1$ and the induction hypothesis holds for
+          any sequence of length $< n$. Then it was created with the inference rule 4 from
+          $(p,q) \attack_a^* \{(p',q')\} \uplus S'$ and
+          $(p',q') \attack_a S''$ with $S = S' ∪ S''$.
+          By the induction hypothesis we get
+          $(p,q) ∈ \mc R \Rightarrow ∃(p'',q'') : (p'',q'') ∈ \{(p',q')\} \uplus S' ∧ (p'',q'') ∈ \mc R$ and
+          $(p',q') ∈ \mc R \Rightarrow ∃(p''',q'''): (p''',q''') ∈ S'' ∧ (p''',q''') ∈ \mc R$.
+          In the cases
+        \begin{enumerate}
+          \item $(p',q') ≠ (p'',q'')$: Then $(p,q) ∈ \mc R \Rightarrow (p'',q'') ∈ S' ⊆ S$.
+          \item $(p',q') = (p'',q'')$: Then $(p,q) ∈ \mc R \Rightarrow (p',q') ∈ \mc R
+            \Rightarrow (p''',q''') ∈ S'' ⊆ S$.
+        \end{enumerate}
+      \end{enumerate}
+      So for any $(p,q) \attack_a^*S ∈ \mc A$ with $(p,q) ∈ R$ we have $S ≠ ∅$, especially
+      for the inital one.
+
+    \Leftarrow: Assume $¬((p,q) \attack_a^* ∅)$.
+      We show that $\mc R := \{ (p,q) \mid ¬((p,q) \attack_a^* ∅ \}$ is a valid
+      refinement relation. First $(p,q) ∈ \mc R$, and for any $(p,q) ∈ \mc R$:
+      \begin{enumerate}
+        \item If $p \may[a] p'$, then
+            by inference rule 1 there exists $(p,q) \attack_a S$.
+            From all $(p,q) \attack_a S$, choose the one where $S$ is minimal
+            with regard to the inclusion order. As $S ≠ ∅$, there is
+            $(p', q') ∈ S$ which was created from a transition $q \may[a] q'$.
+            Assuming $(p',q') \attack_a^* ∅$, by
+            lemma \ref{lemma:attack-associativity} we would get
+            $(p,q) \attack_a^* T ∪ ∅$ with $T ⊆ S ∖ \{p' q'\} ⊊ S$ in contradiction to the minimality
+            of $S$. So $¬((p',q') \attack_a^* ∅)$ and therefore $(p',q') ∈ \mc R$.
+        \item If $q \must[a] q'$, by similiar argument we get a transition
+          $p \must[a] p'$ for which $(p',q') ∈ \mc R$.
+      \end{enumerate}
+      With this refinement relation we have $p ≤_m q$.
+\end{proof}
+
+\section{Visibly pushdown automaton}
+
+\begin{definition}[Visibly pushdown automaton]
+A PRS is a visibly pushdown automaton (vPDA) if
+all processes are sequential and there is a partition
+$Act = Act_r \uplus Act_i \uplus Act_c$
+such that each rule $(p, a, p') ∈ Δ$ has the form
+\begin{align*}
+  p &= P⋅S
+  & &\text{and} &
+  p' &= \begin{cases}
+  Q & \text{if } a ∈ Act_r \quad \text{(return rule)}\\
+  Q⋅T & \text{if } a ∈ Act_i \quad \text{(internal rule)} \\
+  Q⋅T⋅R & \text{if } a ∈ Act_c \quad \text{(call rule)}
+\end{cases}
+\end{align*}
+The modal extension for a \emph{modal visibly pushdown automaton (mvPDA)} is straightforward.
+\end{definition}
+
+\begin{definition}[Attack rules for mvPDA]
+  Let $(\Dmay, \Dmust)$ be an mvPDA.
+  We define a variant $ \attack_b$ of the attack sequences obtainable from the rewrite rules.
+  These are called \emph{attack rules}.
+  For every $p,q ∈ \mc P$, we have:
+  \begin{mathpar}
+    \inferrule{(p, a, p') ∈ \Dmay}{(p,q) \attack_b \{ (p', q') \mid (q, a, q') ∈ \Dmay \}}
+      \, (1) \\
+    \inferrule{(q, a, q') ∈ \Dmust}{(p,q) \attack_b \{ (p', q') \mid (p, a, p') ∈ \Dmust \}}
+      \, (2) \\
+    \inferrule{(p,q) \attack_b \{(p'⋅P,q'⋅Q)\} \uplus S \\ (p',q') \attack_b S' \\
+      ∀(p'',q'') ∈ S' : |p''| ≤ 2 }
+      {(p,q) \attack_b S ∪ \{  (p''⋅P, q''⋅Q) \mid (p'',q'') ∈ S' \}} \, (3) \\
+    \inferrule{(p,q) \attack_b \{(p',q')\} \uplus S \\ (p',q') \attack_b S' \\
+      ∀(p'',q'') ∈ S' : |p''| ≤ 2 }
+      { (p,q) \attack_b S ∪ S'} \, (4)
+  \end{mathpar}
+\end{definition}
+
+%TODO Rule righthandside
+%TODO Rule lefthandside
+
+Due to the conditions on the rewrite rules of an mvPDA and the construction of the
+attack rules, we can see
+that for any element $(p,q) \attack_b S$ it holds that
+$|p| = |q| = 2$ and for any $(p',q') ∈ S$ that $1 ≤ |p'| = |q'| ≤ 3$.
+
+\begin{lemma}
+  \label{lemma:attack-extension}
+  For an MTS generated by a mvPDA, if $(p, q) \attack_a^* S$, then
+  $(p⋅s,q⋅t) \attack_a^* S'$ with $S' = \{ (p'⋅s,q'⋅t) \mid (p', q') ∈ S\}$
+  for any $s,t ∈ \mc P$.
+\end{lemma}
+\begin{proof}
+  By the MTS induction rules, we have that for
+  every $p \may[a] p'$ is generated from a $(p, a, p') ∈ \Dmay$
+  and for a mvPDA therefore $|p| = 2$. Then there is only one transition from $p⋅s$,
+  nameley $p⋅s \may[a] p'⋅s$ generated by the MTS induction rule 1.
+  Also for every $q \must[a] q'$ there is just $q⋅t \may[a] q'⋅t$ from $q⋅t$.
+  
+  Then the proposition is proved by induction on the length of $(p',q') \attack_a^* S'$:
+  \begin{enumerate}
+    \item The sequence has length 1:
+      Then it is a single transition created from $p \may[a] p'$
+      with $S = \{ (p', q') \mid q \may[a] q' \}$ and we get
+      $p⋅s \may[a] p'⋅s$ and $\{ (p'⋅s, q'⋅t) \mid q⋅t \may[a] q'⋅t \} = S'$.
+      If the transition was created from $q \must[a] q'$
+      with $S = \{ (p', q') \mid p \must[a] p' \}$ and we get
+      $\{ (p'⋅s, q'⋅t) \mid p⋅t \must[a] p'⋅t \} = S'$
+      Both cases yield $(p⋅s,q⋅t) \attack_a^* S'$.
+    \item The sequence has length $n > 1$ and the induction hypothesis holds for
+      any sequence of length $< n$: Then
+      $(p',q') \attack_a^* \{ (p'', q'') \} \uplus S''$ and
+      $(p'',q'') \attack_a S'''$ with $S = S'' ∪ S'''$.
+      By induction hypothesis
+      $(p'⋅s,q'⋅t) \attack_a^* \{ (p''⋅s, q''⋅t) \} \uplus \{ (p'''⋅s, q'''⋅t \mid (p''',q'') ∈ S'' \}$ and
+      $(p''⋅s,q''⋅t) \attack_a \{ (p'''⋅s, q'''⋅t) \mid (p''',q''') ∈ S''' \}$.
+      Applying inference rule 4 for attack sequences yields
+      $(p⋅s,q⋅t) \attack_a^* \{ (p'''⋅s, q'''⋅t) \mid (p''',q''') ∈ S'' ∪ S''' \} = S'$
+  \end{enumerate}
+\end{proof}
+
+\begin{theorem}
+  For an mvPDA $(\Dmay, \Dmust)$ with its induced MTS $(\mc P, \may[], \must[])$,
+  it holds that for any $P,S,Q,T ∈ Const$:
+  \[
+    (P⋅S,Q⋅T) \attack_a^* ∅ \iff (P⋅S,Q⋅T) \attack_b ∅
+  \]
+\end{theorem}
+\begin{proof}
+    \Rightarrow: Assume $(P⋅S,Q⋅T) \attack_a^* ∅$ and let $(a_1, a_2, …, a_n)$ be
+      the linear form of a derivation of the attack sequence. Always
+      $a_1$ has the form $(P⋅S, Q⋅T) \attack_a S$ and $a_n$ the form
+      $(p,q) \attack_a ∅$.
+
+      Our proposition is that if we can split up the sequence into subsequences
+      which we can all compute seperately, we can also compute the whole sequence.
+      More formally, we want to show that if there is a
+      set of $k+1$ indices $I = {i_0,…,i_k}$ where
+      \begin{enumerate}
+        \item $0 = i_0 < i_1 < i_2 < … < i_{k-1} < i_k = n$.
+        \item There is a sequence $(b_1, …, b_k)$ where
+          each $b_i$ is an attack rule $(p,q) \attack_b S$.
+        \item For every $i,j ∈ I$ with $i<j$ the sequence $(a_{i+1},…,a_j)$, which
+          generates the attack sequence $(p,q) \attack_a^* S$, the representing rule
+          $b_j$ is $(p,q) \attack_b S$
+          If $j < n$ then with $b_i = (p',q') \attack_b S'$ we require $(p',q') ∈ S'$.
+          and if $j = n$ then $S = ∅$.
+      \end{enumerate}
+      there is $(P⋅S,Q⋅T) \attack_b ∅$.
+
+      We prove this by induction on the number $k$:
+
+      \begin{enumerate}
+        \item $k=1$: Then the indices are $0, n$ and the rule sequence $(b_1)$
+          represents $(a_1, …, a_n)$ generating $(P⋅S, Q⋅T) \attack_a^* ∅$.
+          Then we have $(P⋅S, Q⋅T) \attack_b ∅$.
+        \item $k > 1$, and the induction hypothesis holds for any $k' < k$:
+          Let $(b_1, …, b_k)$ be the rule sequence.
+          For the first rule $b_1 = (P⋅S,Q⋅T) \attack_b S$, there
+          is be $(p',q') ∈ S$ with $|p'| = |q'| ≥ 2$ because otherwise no more rules
+          could be applied afterwards, in contradiction to $k > 1$.
+          So this is a left-hand side rule.
+          Also the last rule $b_k = (p',q') \attack_b ∅$ is a right-hand side rule.
+          %
+      \end{enumerate}
+    \Leftarrow:
+      We show that for $(p,q) \attack_b S$, there is $T ⊆ S$ with $(p,q) \attack_a^* T$
+      by induction on the inference of
+      $(p,q) \attack_b S$:
+      \begin{enumerate}
+        \item It was created by rule 1 from $(p, a, p') ∈ \Dmay$. Then there is
+          $p \may[a] p'$.
+          For every $(q, a, q') ∈ \Dmay$ there is $q \may[a] q'$ and for every
+          $q \may[a] q''$ it follows that $q' = q''$.
+          Then $\{ (p', q') \mid q \may[a] q' \} = S$ and
+          $(p, q) \attack_a^* S$.
+        \item It was created by rule 2 from $(q, a, q') ∈ \Dmust$. Then there is
+          $q \may[a] q'$.
+          For every $(p, a, p') ∈ \Dmay$ there is $p \may[a] p'$ and for every
+          $p \may[a] p''$ it follows that $p' = p''$.
+          Then $\{ (p', q') \mid p \may[a] p' \} = S$ and
+          $(p, q) \attack_a^* S$.
+        \item It was created by rule 3 from $(p,q) \attack_b \{(p'⋅P,q'⋅Q)\} \uplus S'$ and
+          $(p',q') \attack_b S''$ with $S = S' ∪ S'''$ for $S''' = \{  (p''⋅P, q''⋅Q) \mid (p'',q'') ∈ S'' \}$
+          Then by induction hypothesis there is $T' ⊆ \{(p'⋅P,q'⋅Q)\} \uplus S'$ with
+          $(p,q) \attack_a^* T'$ and $T'' ⊆ S''$ with $(p',q') \attack_a^* T''$.
+          If $(p'⋅P,q'⋅Q) ∉ T'$, then we get $T' ⊆ S' ⊆ S$.
+          If $(p',q') ∈ T'$, with lemma \ref{lemma:attack-extension} we have
+          regard the $(p'⋅P,q'⋅Q) \attack_a^* T'''$ with $T''' ⊆ S'''$.
+          Then with lemma \ref{lemma:attack-associativity} we get
+          that there is $T ⊆ T' ∖ \{(p',q'\} ∪ T''' ⊆ S' ∪ S''' = S$ with $(p,q) \attack_a^* T$.
+        \item It was created by rule 4 from $(p,q) \attack_b \{(p',q')\} \uplus S'$ and
+          $(p',q') \attack_b S''$ with $S = S' ∪ S''$.
+          Then by induction hypothesis there is $T' ⊆ \{(p',q')\} \uplus S'$ with
+          $(p,q) \attack_a^* T'$ and $T'' ⊆ S''$ with $(p',q') \attack_a^* T''$.
+          If $(p',q') ∉ T'$, then we get $T' ⊆ S' ⊆ S$.
+          If $(p',q') ∈ T'$, then with lemma \ref{lemma:attack-associativity} we get
+          that there is $T ⊆ T' ∖ \{(p',q'\} ∪ T'' ⊆ S' ∪ S'' = S$ with $(p,q) \attack_a^* T$.
+      \end{enumerate}
+      Then if $(P⋅S,Q⋅T) \attack_b ∅$ we have $(P⋅S,Q⋅T) \attack_a^* ∅$
+\end{proof}
+
+% theory and background
+

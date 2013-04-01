@@ -1,0 +1,42 @@
+\documentclass[a4paper]{scrartcl}
+\pagestyle{plain}
+
+%% Language packages
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+%% Graphics and picture packages
+\usepackage{graphicx} %% Load graphics
+\usepackage{tikz}     %% Create vector graphics
+
+%% Mathematical packages
+\usepackage{amsmath,amssymb}
+
+%% Other packages
+\usepackage{listings}
+\usepackage{setspace} 
+
+%% New and renewed commands
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\renewcommand{\|}{\ |\ }
+
+\begin{document}
+
+% Title and TOC
+\input{./title.tex}
+\tableofcontents
+
+% Content
+\input{./chapter1.tex}
+
+% Biliography
+\clearpage
+%\nocite{*}
+\renewcommand{\refname}{\section{References}} % Using "Sources" as the title of the section
+\bibliographystyle{plain}
+\bibliography{thesis}
+
+\end{document}
+

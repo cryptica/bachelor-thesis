@@ -1,0 +1,70 @@
+% TUM logo
+\def\oTUM#1{%
+\dimen1=#1\dimen1=.1143\dimen1
+\dimen2=#1\dimen2=.419\dimen2
+\dimen3=#1\dimen3=.0857\dimen3
+\dimen0=#1\dimen0=.018\dimen0
+\dimen4=\dimen1\advance\dimen4 by-\dimen0
+\setbox1=\vbox{\hrule width\dimen0 height\dimen4 depth0pt}
+\advance\dimen4 by\dimen2
+\setbox8=\vbox{\hrule width\dimen0 height\dimen4 depth0pt}
+\advance\dimen4 by-\dimen2\advance\dimen4 by-\dimen0
+\setbox4=\vbox{\hrule width\dimen4 height\dimen0 depth0pt}
+\advance\dimen4 by\dimen1\advance\dimen4 by\dimen3
+\setbox6=\vbox{\hrule width\dimen4 height\dimen0 depth0pt}
+\advance\dimen4 by\dimen3\advance\dimen4 by\dimen0
+\setbox9=\vbox{\hrule width\dimen4 height\dimen0 depth0pt}
+\advance\dimen4 by\dimen1
+\setbox7=\vbox{\hrule width\dimen4 height\dimen0 depth0pt}
+\dimen4=\dimen3
+\setbox5=\vbox{\hrule width\dimen4 height\dimen0 depth0pt}
+\advance\dimen4 by-\dimen0
+\setbox2=\vbox{\hrule width\dimen4 height\dimen0 depth0pt}
+\dimen4=\dimen2\advance\dimen4 by\dimen0
+\setbox3=\vbox{\hrule width\dimen0 height\dimen4 depth0pt}
+\setbox0=\vbox{\hbox{\box9\lower\dimen2\copy3\lower\dimen2\copy5
+\lower\dimen2\copy3\box7}\kern-\dimen2\nointerlineskip
+\hbox{\raise\dimen2\box1\raise\dimen2\box2\copy3\copy4\copy3
+\raise\dimen2\copy5\copy3\box6\copy3\raise\dimen2\copy5\copy3\copy4\copy3
+\raise\dimen2\box5\box3\box4\box8}}
+\leavevmode\box0}
+
+% math commands
+\newcommand{\Dmay}{Δ_\text{may}}
+\newcommand{\Dmust}{Δ_\text{must}}
+\newcommand{\may}[1][]{\ifthenelse{\isempty{#1}{}}
+  {\dashrightarrow}
+  {\stackrel{\text{#1}}{\dashrightarrow}}
+}
+\newcommand{\must}[1][]{\ifthenelse{\isempty{#1}}
+  {\longrightarrow}
+  {\stackrel{\text{#1}}{\longrightarrow}}
+}
+\newcommand{\attack}[1][]{\ifthenelse{\isempty{#1}}
+  {\longrightarrow}
+  {\stackrel{\text{#1}}{\longrightarrow}}
+}
+\newcommand{\call}{\text{call}}
+\newcommand{\return}{\text{return}}
+\newcommand{\internal}{\text{internal}}
+\newcommand{\mc}{\mathcal}
+
+% define theorems
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\theoremstyle{plain}
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+
+% tikz options
+\tikzset{  
+  state/.style={text centered, rectangle, draw},
+  attack/.style={below=0.8em},
+  defense/.style={above=0.1em},
+  grow=right,
+  sloped,
+  edge from parent/.style={->,draw,shorten >=5pt, shorten <=5pt},
+}

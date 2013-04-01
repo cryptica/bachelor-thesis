@@ -1,0 +1,303 @@
+\chapter{Algorithms}
+
+\section{Description}
+
+% pseudocode
+\begin{figure}[ht]
+\caption{Algorithm for calculating the attack rules on mvPDAs}
+\begin{algorithmic}[1]
+\Function{AttackRules}{$mvPDA = (\Dmay, \Dmust)$}
+  \State $rules ← ∅$
+  \For{$P,Q,S,T ∈ Const(mvPDA), a ∈ Act(mvPDA), type ∈ \{\text{may},\text{must}\}$}
+    \If{$type = \text{may}$}
+      \State $lhs ← (P⋅S, Q⋅T)$
+      \Comment{Attack from left-hand side for may rules}
+    \Else
+      \State $lhs ← (Q⋅S, P⋅Y)$
+      \Comment{Attack from right-hand side for must rules}
+    \EndIf
+    %\State $lhs ← (p, q)(X, Y)$
+    \For{$(P⋅S, a, p') ∈ Δ_{type}$}
+      \State $rhs ← ∅$
+      \For{$(Q⋅T, a, q') ∈ Δ_{type}$}
+        \If{$type = \text{may}$}
+          \State $newRhs ← (p', q')$
+        \Else
+          \State $newRhs ← (q', p')$
+        \EndIf
+        \State $rhs ← rhs ∪ \{ newRhs \}$
+      \EndFor
+      \State $rules ← rules ∪ \{(lhs, rhs)\}$
+    \EndFor
+  \EndFor
+  \State \textbf{return} $rules$
+\EndFunction
+\end{algorithmic}
+\end{figure}
+
+\begin{figure}[ht]
+\caption{Algorithm for combining attack rules}
+\begin{algorithmic}[1]
+  \Function{Combine}{$lhsRule = (lhs, lhsRhsSet), rhsRule = (rhsLhs, rhsSet)$}
+  \State $rules ← ∅$
+  \If{$\forall rhs ∈ rhsSet : size(rhs) ≤ 1$}
+    \For{$lhsRhs ∈ lhsRhsSet : lhsRhs = rhsLhs⋅p$}
+      \State $newRhs ← (lhsRhsSet ∖ lhsRhs) ∪ \{ rhs⋅p \mid rhs ∈ rhsSet \}$
+      \State $rules ← rules ∪ \{ (lhs, newRhs) \}$
+    \EndFor
+  \EndIf
+  \State \textbf{return} $rules$
+\EndFunction
+\end{algorithmic}
+\end{figure}
+
+\begin{figure}[ht]
+\caption{Refinement algorithm for mvPDAs}
+\begin{algorithmic}[1]
+\Function{VPDARefinement}{$P⋅S, Q⋅T, mvPDA$}
+  \Comment{$P⋅S ≤_m Q⋅T$ given $mvPDA$}
+  \State $initial ← [P⋅S, Q⋅T]$
+  \State $rules ← \Call{AttackRules}{mvPDA}$
+  \While{$\exists lhsRule, rhsRule ∈ rules :
+      \Call{Combine}{lhsRule, rhsRule} ⊄ rules $}
+    \State $rules ← rules ∪ \Call{Combine}{lhsRule, rhsRule}$
+  \EndWhile
+  \State \textbf{return} $(initial, ∅) ∈ rules$
+\EndFunction
+\end{algorithmic}
+\end{figure}
+
+\section{Soundness and completeness}
+
+\subsection{Soundness}
+% proof: no refinement => algorithm outputs false
+% proof: algorithm outputs false => no refinement
+\subsection{Completeness}
+% termination proof
+% termination proof
+
+\section{Runtime}
+
+% tests with complete number
+
+\section{Optimizations}
+
+% only keep smallest rhs rules
+
+% exploration of reachable states
+
+% hash map for looking up lhs/rhs
+
+% early stopping
+
+\section{Performance evaluation}
+
+\section{Example}
+
+Figure \ref{mvpda-p} and \ref{mvpda-q} define two mvPDA. The corresponding may transitions for the must transitions are implied.
+The problem is to decide whether $p⋅S ≤_m q⋅S$.
+
+\begin{figure*}[ht]
+  \centering
+  \begin{minipage}[b]{.4\textwidth}
+    \begin{align*}
+      P⋅S &\must[coin] P⋅M⋅S \\
+      P⋅M &\must[coin] P⋅M⋅M \\
+      P⋅M &\must[tea] T \\
+      P⋅M &\must[coffee] c \\
+      T⋅M &\must[tea] T \\
+      T⋅S &\must[coin] P⋅M⋅S \\
+      c⋅M &\must[coffee] c \\
+      c⋅S &\must[coin] P⋅M⋅S
+    \end{align*}
+    \caption{mvPDA for process $P⋅S$}\label{mvpda-p}
+  \end{minipage}\qquad
+  \begin{minipage}[b]{.4\textwidth}
+    \begin{align*}
+      Q⋅S &\may[coin] Q⋅T⋅S \\
+      Q⋅S &\may[coin] Q⋅C⋅S \\
+      Q⋅T &\may[coin] Q⋅T⋅T \\
+      Q⋅C &\may[coin] Q⋅C⋅C \\
+      Q⋅T &\must[tea] Q \\
+      Q⋅T &\may[coffee] Q \\
+      Q⋅C &\may[tea] Q \\
+      Q⋅C &\must[coffee] Q
+    \end{align*}
+    \caption{mvPDA for process $Q⋅S$}\label{mvpda-q}
+  \end{minipage}
+\end{figure*}
+
+\begin{figure*}[ht]
+  \centering
+\begin{tikzpicture}[
+  level 1/.style={level distance=6cm, sibling distance=3.5cm},
+  level 2/.style={level distance=8cm, sibling distance=2cm},
+  level 3/.style={level distance=7cm, sibling distance=2cm},
+  edge from parent path={(\tikzparentnode.east) -- (\tikzchildnode.west)},
+  scale=0.6,
+  every node/.style={scale=0.6}
+]
+\node[state] {$(p⋅S,q⋅S)$}
+    child {
+        node[state] {$(p⋅M⋅S,q⋅T⋅S)$}
+        child {
+          node[state] {$(p⋅M⋅M⋅S,q⋅T⋅T⋅S)$}
+          child {
+            node[state] {$(c⋅M⋅T,q⋅T⋅S)$}
+            node[attack] {$q⋅T \must[tea] q $}
+            edge from parent
+            node[defense] {$q⋅T \may[coffee] q $}
+          }
+          node[attack] {$p⋅M \may[coffee] c $}
+          edge from parent
+          node[defense] {$q⋅T \may[coin] q⋅T⋅T $}
+        }
+        node[attack] {$p⋅M \may[coin] p⋅M⋅M $}
+        edge from parent
+        node[defense] {$q⋅S \may[coin] q⋅T⋅S $}
+    }
+    child {
+        node[state] {$(p⋅M⋅S,q⋅C⋅S)$}
+        child {
+          node[state] {$(p⋅M⋅M⋅S,q⋅C⋅C⋅S)$}
+          child {
+            node[state] {$(T⋅M⋅S,q⋅C⋅S)$}
+            node[attack] {$q⋅C \must[coffee] q $}
+            edge from parent
+            node[defense] {$q⋅C \may[tea] q $}
+          }
+          node[attack] {$p⋅M \may[tea] T $}
+          edge from parent
+          node[defense] {$q⋅C \may[coin] q⋅C⋅C $}
+        }
+        node[attack] {$p⋅M \may[coin] p⋅M⋅M $}
+        edge from parent
+        node[defense] {$q⋅S \may[coin] q⋅C⋅S $}
+    }
+    node[attack] {$p⋅S \may[coin] p⋅M⋅S $}
+    ;
+\end{tikzpicture}
+  \caption{Tree for winning strategy}\label{pq-tree}
+\end{figure*}
+
+\begin{figure*}[ht]
+  \centering
+\begin{tikzpicture}[
+  level 1/.style={level distance=2cm, sibling distance=4cm},
+  level 2/.style={level distance=8cm, sibling distance=2cm},
+  level 3/.style={level distance=6cm, sibling distance=2cm},
+  northchild/.style={edge from parent path={(\tikzparentnode.north) -- (\tikzchildnode.south)}},
+  southchild/.style={edge from parent path={(\tikzparentnode.south) -- (\tikzchildnode.north)}},
+  rightchild/.style={edge from parent path={(\tikzparentnode.east) -- (\tikzchildnode.west)}},
+  scale=0.6,
+  every node/.style={scale=0.6}
+]
+\node[state] {$(p⋅S,q⋅S) \attack[] \{ (p⋅M⋅S,q⋅C⋅S), (p⋅M⋅S,q⋅T⋅S) \}$}
+    child[southchild] {
+      node[state] {$(p⋅M,q⋅T) \attack[] \{ (p⋅M⋅M,q⋅T⋅T) \}$}
+        child[rightchild] {
+          node[state] {$(p⋅M,q⋅T) \attack[] \{ (c,q) \} $}
+          child[rightchild] {
+            node[state] {$(c⋅M,q⋅T) \attack[] ∅$}
+            edge from parent
+            node[defense] {return}
+          }
+          edge from parent
+          node[defense] {call}
+        }
+        edge from parent
+        node[defense] {call}
+    }
+    child[northchild] {
+      node[state] {$(p⋅M,q⋅C) \attack[] \{ (p⋅M⋅M,q⋅C⋅C) \}$}
+        child[rightchild] {
+          node[state] {$(p⋅M,q⋅C) \attack[] \{ (T,q) \} $}
+          child[rightchild] {
+            node[state] {$(T⋅M,q⋅C) \attack[] ∅$}
+            edge from parent
+            node[defense] {return}
+          }
+          edge from parent
+          node[defense] {call}
+        }
+        edge from parent
+        node[defense] {call}
+    }
+    ;
+\end{tikzpicture}
+  \caption{Tree for winning strategy with attack rules}\label{pq-attack-tree}
+\end{figure*}
+
+\begin{figure*}[ht]
+  \centering
+\begin{tikzpicture}[
+  level 1/.style={level distance=10cm, sibling distance=4cm},
+  level 2/.style={level distance=8cm, sibling distance=2cm},
+  state/.style={text centered, rectangle, draw},
+  edge from parent path={(\tikzparentnode.east) -- (\tikzchildnode.west)},
+  scale=0.6,
+  every node/.style={scale=0.6}
+]
+\node[state] {$(p⋅S,q⋅S) \attack[] \{ (p⋅M⋅S,q⋅C⋅S), (p⋅M⋅S,q⋅T⋅S) \}$}
+    child {
+      node[state] {$(p⋅M,q⋅T) \attack[] \{ (c⋅M,q⋅T) \}$}
+        child {
+          node[state] {$(c⋅M,q⋅T) \attack[] ∅$}
+          edge from parent
+          node[defense] {internal}
+        }
+        edge from parent
+        node[defense] {call}
+    }
+    child {
+      node[state] {$(p⋅M,q⋅C) \attack[] \{ (T⋅M,q⋅C) \}$}
+        child {
+          node[state] {$(T⋅M,q⋅C) \attack[] ∅$}
+          edge from parent
+          node[defense] {internal}
+        }
+        edge from parent
+        node[defense] {call}
+    }
+    ;
+\end{tikzpicture}
+  \caption{Merged tree for winning strategy with attack rules after one step}\label{pq-attack-tree-1}
+\end{figure*}
+
+
+\begin{figure*}[ht]
+  \centering
+\begin{tikzpicture}[
+  level 1/.style={level distance=12cm, sibling distance=4cm},
+  edge from parent path={(\tikzparentnode.east) -- (\tikzchildnode.west)},
+  scale=0.6,
+  every node/.style={scale=0.6}
+]
+\node[state] {$(p⋅S,q⋅S) \attack[] \{ (p⋅M⋅S,q⋅C⋅S), (p⋅M⋅S,q⋅T⋅S) \}$}
+    child {
+      node[state] {$(p⋅M,q⋅T) \attack[] ∅$}
+        edge from parent
+        node[defense] {call}
+    }
+    child {
+      node[state] {$(p⋅M,q⋅C) \attack[] ∅$}
+        edge from parent
+        node[defense] {call}
+    }
+    ;
+\end{tikzpicture}
+  \caption{Merged tree for winning strategy with attack rules after two steps}\label{pq-attack-tree-2}
+\end{figure*}
+
+
+\begin{figure*}[ht]
+  \centering
+\begin{tikzpicture}[
+  edge from parent path={(\tikzparentnode.east) -- (\tikzchildnode.west)},
+  scale=0.6,
+  every node/.style={scale=0.6}
+]
+\node[state] {$(p⋅S,q⋅S) \attack[] ∅$};
+\end{tikzpicture}
+  \caption{Final merged tree for winning strategy}\label{pq-attack-tree-3}
+\end{figure*}

@@ -1,0 +1,58 @@
+This is BibTeX, Version 0.99d (TeX Live 2012/Arch Linux)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: main.aux
+A level-1 auxiliary file: definitions.aux
+A level-1 auxiliary file: outer_cover.aux
+A level-1 auxiliary file: inner_cover.aux
+A level-1 auxiliary file: declaration.aux
+A level-1 auxiliary file: contents.aux
+A level-1 auxiliary file: introduction.aux
+A level-1 auxiliary file: theory.aux
+A level-1 auxiliary file: algorithms.aux
+A level-1 auxiliary file: conclusion.aux
+The style file: amsalpha.bst
+Database file #1: main.bib
+Warning--I'm ignoring BenesK12's extra "booktitle" field
+--line 10 of file main.bib
+You've used 4 entries,
+            2624 wiz_defined-function locations,
+            602 strings with 5119 characters,
+and the built_in function-call counts, 1823 in all, are:
+= -- 175
+> -- 74
+< -- 3
++ -- 24
+- -- 24
+* -- 160
+:= -- 289
+add.period$ -- 4
+call.type$ -- 4
+change.case$ -- 24
+chr.to.int$ -- 4
+cite$ -- 4
+duplicate$ -- 71
+empty$ -- 140
+format.name$ -- 30
+if$ -- 369
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 8
+newline$ -- 22
+num.names$ -- 14
+pop$ -- 24
+preamble$ -- 1
+purify$ -- 28
+quote$ -- 0
+skip$ -- 54
+stack$ -- 0
+substring$ -- 141
+swap$ -- 14
+text.length$ -- 3
+text.prefix$ -- 2
+top$ -- 0
+type$ -- 32
+warning$ -- 0
+while$ -- 20
+width$ -- 6
+write$ -- 54
+(There was 1 warning)

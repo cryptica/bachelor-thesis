@@ -1,0 +1,81 @@
+\begin{definition}[Attack tree]
+  An attack tree over the set of paired processes $\mc P^2 = \mc P × \mc P$
+  is a tupel $(V, E, r, i, S)$ with
+  $V ⊆ \mc P^2 × 2^{P^2}$, $E ⊆ V × V$, $r ∈ V$, $i ∈ \mc P$ and $S ⊆ \mc P^2$
+  such that $(V, E)$ is a tree with $r$ as its root.
+\end{definition}
+
+\begin{definition}[Attack tree set]
+  Let $(\mc P, \may, \must)$ be an MTS.
+  The set of rooted \emph{attack trees} $\mc A$ over the set of nodes
+  $V ⊆ \mc P^2 × 2^{P^2}$
+  and edges $E ⊆ V × V$ is given by the inference rules
+  for every $p,q ∈ \mc P$:
+  \begin{enumerate}
+    \item If $p \may[a] p'$, then with $S = \{ (p', q') \mid q \may[a] q' \}$
+      and $r := ((p, q), S)$
+       $( \{ r \}, ∅, r, r, S)$ is an attack tree.
+    \item If $q \must[a] q'$, then with $S = \{ (p', q') \mid p \must[a] p' \}$
+      and $r := ((p, q), S)$
+       $( \{ r \}, ∅, r, r, S)$ is an attack tree.
+    \item If $(V_1, E_1, r_1, i_1, S_1)$ is an attack tree, $(V_2, E_2, r_2, i_2, S_2)$ is an attack tree
+      and $i_2 ∈ S_1$ then $(V_1 ∪ V_2, E_1 ∪ E_2 ∪ \{ (r_2, r_2) \}, r_1, i_1, S_1 ∖ \{i_2\} ∪ S_2)$ is
+      an attack tree.
+  \end{enumerate}
+\end{definition}
+
+\begin{theorem}
+  For an MTS $(\mc P, \may, \must)$ with its attack tree set $\mc A$
+  and processes $p,q ∈ \mc P$:
+  \[
+    (p ≤_m q) \iff ¬∃V, E : (V, E, (p,q), ∅) ∉ \mc A
+  \]
+\end{theorem}
+
+\begin{proof}
+    \Rightarrow: Assume $p ≤_m q$. Then there is a refinement relation $\mc R$.
+      We show that for any $( V, E, (p, q), S ) ∈ \mc A$ that
+      $(p,q) ∈ \mc R \Rightarrow ∃ (p',q') : (p',q') ∈ \mc S ∧ (p',q') ∈ \mc R$
+      by structural induction on the inference of the attack tree $(V, E, (p, q), S)$:
+      \begin{enumerate}
+        \item It was created with the inference rule 1 from $p \may[a] p'$.
+          If $(p,q) ∈ \mc R$ we get by refinement that there is a transition
+          $q \may[a] q'$ with $(p',q') ∈ \mc R$ and therefore $(p',q') ∈ S $.
+        \item It was created with the inference rule 2 from $q \must[a] q'$.
+          If $(p,q) ∈ \mc R$ we get by refinement that there is a transition
+          $p \must[a] p'$, with $(p',q') ∈ \mc R$ and therefore $(p',q') ∈ S$.
+        \item It was created with the inference rule 3 from
+          $(V', E', (p,q), \{(p',q')\} \uplus S') ∈ \mc A$ and
+          $(V'', E'', (p',q'), S'') ∈ \mc A$ with $S = S' ∪ S''$.
+          By the induction hypothesis we get
+          $(p,q) ∈ \mc R \Rightarrow ∃(p'',q'') : (p'',q'') ∈ \{(p',q')\} \uplus S' ∧ (p'',q'') ∈ \mc R$ and \\
+          $(p',q') ∈ \mc R \Rightarrow ∃(p''',q'''): (p''',q''') ∈ S'' ∧ (p''',q''') ∈ \mc R$.
+          In the cases
+        \begin{enumerate}
+          \item $(p',q') ≠ (p'',q'')$: Then $(p,q) ∈ \mc R \Rightarrow (p'',q'') ∈ S' ⊆ S$.
+          \item $(p',q') = (p'',q'')$: Then $(p,q) ∈ \mc R \Rightarrow (p',q') ∈ \mc R
+            \Rightarrow (p''',q''') ∈ S'' ⊆ S$.
+        \end{enumerate}
+      \end{enumerate}
+      So for any $((p,q), S) ∈ \mc A$ with $(p,q) ∈ R$ we have $S ≠ ∅$, especially
+      for the inital one.
+
+    \Leftarrow: Assume $((p,q), ∅) ∉ \mc A$.
+      We show that $\mc R := \{ (p,q) \mid (p,q), ∅) ∉ \mc A \}$ is a valid
+      refinement relation. First $(p,q) ∈ \mc R$, and for any $(p,q) ∈ \mc R$:
+      \begin{enumerate}
+        \item If $p \may[a] p'$, then
+            by inference rule 1 $((p,q), S) ∈ \mc A$
+            with $S = \{ (p', q') \mid q \may[a] q' \}$.
+            If we would have $∀ (p', q') ∈ S : ((p',q'), ∅) ∈ \mc A$, we would get
+            $((p,q), ∅) ∈ \mc A$ by repeated application of inference rule 3, which
+            is in contradiction to the assumption.
+            So $∃ (p', q') ∈ S : ((p',q'), ∅) ∉ \mc A$. This element was created by
+            a transition $q \may[a] q'$ for which $(p',q') ∈ \mc R$.
+        \item If $q \must[a] q'$, by similiar argument we get a transition
+          $p \must[a] p'$ for which $(p',q') ∈ \mc R$.
+      \end{enumerate}
+      With this refinement relation we have $p ≤_m q$.
+\end{proof}
+
+

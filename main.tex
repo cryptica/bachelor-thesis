@@ -1,0 +1,60 @@
+% Document class, with margin for binding
+\documentclass[	pdftex, 
+                a4paper,
+                12pt, DIV11, BCOR5mm,
+                parskip,								
+                pointlessnumbers					
+                ]{scrbook}
+
+% Mathematical packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathpartir}
+
+% Graphical packages
+\usepackage{tikz}
+\usetikzlibrary{trees}
+
+% Input config
+\usepackage{luatextra} % also loads fixltx2e, fontspec, xunicode
+\usepackage{unicode-math}
+
+% Font config
+\setmainfont{Linux Libertine O}
+\setsansfont{Linux Biolinum O}
+\newfontfamily\scfont[Letters=SmallCaps]{Linux Libertine O}
+\setmathfont{Latin Modern Math}
+\setmonofont{Inconsolata}
+
+% Listings and pseudo code
+\usepackage{listings}
+\usepackage{algpseudocode}
+\algnewcommand{\LineComment}[1]{\State \(\triangleright\) #1}
+
+% References
+\usepackage[nottoc]{tocbibind} % Bibliograhy in table of contents
+\usepackage{hyperref} % TODO: remove before print
+
+% Other stuff
+\usepackage{xifthen}
+
+\begin{document}
+
+\include{definitions}
+
+\include{outer_cover}
+\include{inner_cover}
+\include{declaration}
+%\include{abstract}
+\include{contents}
+
+\include{introduction}
+\include{theory}
+\include{algorithms}
+\include{conclusion}
+
+\bibliographystyle{amsalpha}
+\bibliography{main}
+
+\end{document}
