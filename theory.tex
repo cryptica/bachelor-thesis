@@ -101,9 +101,9 @@ An mPRS $(\Dmay, \Dmust)$ induces an MTS $(\mc P, \may[], \must[])$ as follows:
 
 % modal refinement of two MTS
 
-\section{Attack sequences}
+\section{Attack tree}
 
-\begin{definition}[Attack transition and attack sequence]
+\begin{definition}[Attack transition and attack tree]
   Let $(\mc P, \may, \must)$ be an MTS.
   An \emph{attack transition} is a tupel $((p,q), S)$ with $(p,q) ∈ \mc P^2 = \mc P × \mc P$
   and $S ⊆ \mc P$, also written as $(p,q) \attack_a S$.
@@ -114,19 +114,17 @@ An mPRS $(\Dmay, \Dmust)$ induces an MTS $(\mc P, \may[], \must[])$ as follows:
     \inferrule{q \must[a] q'}{(p,q) \attack_a \{ (p', q') \mid p \must[a] p' \}}
       \, (2) \\
   \end{mathpar}
-  An \emph{attack sequence} $(p,q) \attack_a^* S$ is given by
+  The set of \emph{attack trees} labeled by $s ∈ \mc P^2$ and $S ⊆ \mc P^2$ is given by
   \begin{mathpar}
-    \inferrule{(p,q) \attack_a S}
-      {(p,q) \attack_a^* S} \, (3) \hspace{1cm}
-    \inferrule{(p,q) \attack_a^* \{(p',q')\} \uplus S \\ (p',q') \attack_a S'}
-      {(p,q) \attack_a^* S ∪ S'} \, (4)
+    \inferrule{(p, q) \attack_a \{s_1, …, s_n\} \\ ∀ i : (s_i, T_i \atree)}
+      {((p, q), (T_1, …, T_n) \atree)} \, (4)
   \end{mathpar}
-  The derivation of an attack sequence $(p,q) \attack_a^o S$
-  can be displayed in a linear form $( a_1, a_2, …, a_n )$
-  consisting of attack transitions $a_i$ with $a_1 = ((p,q), S')$ by following the
-  linear inference chain. The length of an attack sequence is the number of
-  inference rules applied to obtain it. An attack transition is also a sequence of length 1.
+  
+  For each state $(p,q) ∈ \mc A$ we can construct a rooted and labeled \emph{attack tree}
+  by setting the root to $(p,q)$, labeling it with $(p,q) \attack_a S$ and setting
+  the set of successors to the trees of states $(p',q') ∈ S$.
 
+  %TODO rewrite
   Intuitively, an attack transition $(p,q) \attack_a S$ means that from  
   the state $(p,q)$, there is a sequence of \emph{attack transitions}, that is 
   a may transition from the left side or a must transition from the right side,
@@ -135,82 +133,40 @@ An mPRS $(\Dmay, \Dmust)$ induces an MTS $(\mc P, \may[], \must[])$ as follows:
   with the same action symbol from the other side.
 \end{definition}
 
-\begin{lemma}
-  \label{lemma:attack-associativity}
-  If $(p, q) \attack_a^* \{ (p',q') \} \uplus S$ and $(p',q') \attack_a^* S'$,
-  then there is $T ⊆ S$ with $(p, q) \attack_a^* T ∪ S'$.
-\end{lemma}
-\begin{proof}
-  Proof by induction on the length of $(p',q') \attack_a^* S'$:
-  \begin{enumerate}
-    \item The sequence has length 1: Then
-      $(p',q') \attack_a S'$ and by rule 4
-      $(p, q) \attack_a^* S ∪ S'$.
-    \item The sequence has length $n > 1$ and the induction hypothesis holds for
-      any sequence of length $< n$: Then
-      $(p',q') \attack_a^* \{ (p'', q'') \} \uplus S''$ and
-      $(p'',q'') \attack_a S'''$ with $S' = S'' ∪ S'''$. By induction hypothesis
-      there is $T ⊆ S$ with
-      $(p, q) \attack_a^* T ∪ (\{ (p'', q'') \} \uplus S'')$.
-      Now if $(p'', q'') ∉ T$, we get $(p, q) \attack_a^* T ∪ S'' ∪ S''' = T ∪ S'$.
-      If $(p'', q'') ∈ T$, we get $(p, q) \attack_a^* T' ∪ S'' ∪ S''' = T' ∪ S'$
-        with $T' = T ∖ \{(p'', q'') ⊆ S$
-  \end{enumerate}
-\end{proof}
-
 \begin{theorem}
   \label{theorem:attack-refinement}
   For an MTS $(\mc P, \may, \must)$ and processes $p,q ∈ \mc P$:
   \[
-    (p ≤_m q) \iff ¬((p,q) \attack_a^* ∅)
+    (p ≤_m q) \iff ¬∃ T : ((p,q), T \atree)
   \]
 \end{theorem}
 
 \begin{proof}
     \Rightarrow: Assume $p ≤_m q$. Then there is a refinement relation $\mc R$.
-      We show that for any $(p, q) \attack_a^* S$ that
-      $(p,q) ∈ \mc R \Rightarrow ∃ (p',q') : (p',q') ∈ \mc S ∧ (p',q') ∈ \mc R$
-      by induction on the length of the attack sequence $(p, q) \attack_a^* S$:
+      Assume there is an attack tree $((p, q), T \atree)$.
+      We show that any $((p,q), T)$ that $(p, q) ∉ R$
+      by induction on the attack tree:
       \begin{enumerate}
-        \item The sequence has length 1: Then it is an attack transition created by rule 1 or 2.
-        \begin{enumerate}
-          \item If it was created with the inference rule 1 from $p \may[a] p'$.
-            If $(p,q) ∈ \mc R$ we get by refinement that there is a transition
-            $q \may[a] q'$ with $(p',q') ∈ \mc R$ and therefore $(p',q') ∈ S $.
-          \item If it was created with the inference rule 2 from $q \must[a] q'$.
-            If $(p,q) ∈ \mc R$ we get by refinement that there is a transition
-            $p \must[a] p'$, with $(p',q') ∈ \mc R$ and $(p',q') ∈ S$.
-        \end{enumerate}
-        \item The sequence has length $n > 1$ and the induction hypothesis holds for
-          any sequence of length $< n$. Then it was created with the inference rule 4 from
-          $(p,q) \attack_a^* \{(p',q')\} \uplus S'$ and
-          $(p',q') \attack_a S''$ with $S = S' ∪ S''$.
-          By the induction hypothesis we get
-          $(p,q) ∈ \mc R \Rightarrow ∃(p'',q'') : (p'',q'') ∈ \{(p',q')\} \uplus S' ∧ (p'',q'') ∈ \mc R$ and
-          $(p',q') ∈ \mc R \Rightarrow ∃(p''',q'''): (p''',q''') ∈ S'' ∧ (p''',q''') ∈ \mc R$.
-          In the cases
-        \begin{enumerate}
-          \item $(p',q') ≠ (p'',q'')$: Then $(p,q) ∈ \mc R \Rightarrow (p'',q'') ∈ S' ⊆ S$.
-          \item $(p',q') = (p'',q'')$: Then $(p,q) ∈ \mc R \Rightarrow (p',q') ∈ \mc R
-            \Rightarrow (p''',q''') ∈ S'' ⊆ S$.
-        \end{enumerate}
+        \item $T = ()$. Then there is an attack transition $(p, q) \attack_a ∅$.
+          Contradiction.
+        \item $T = (T_1, …, T_n)$. Then $(p, q) \attack_a (s_1, …, s_2)$.
+          By refinement there is an $s_i ∈ \mc R$. But as $(s_i, T_i \atree)$
+          the induction hypothesis gives $s_i ∉ \mc R$ resulting in a contradiction.
       \end{enumerate}
-      So for any $(p,q) \attack_a^*S ∈ \mc A$ with $(p,q) ∈ R$ we have $S ≠ ∅$, especially
-      for the inital one.
+      So for $(p,q)$ there is no attack tree.
 
-    \Leftarrow: Assume $¬((p,q) \attack_a^* ∅)$.
-      We show that $\mc R := \{ (p,q) \mid ¬((p,q) \attack_a^* ∅ \}$ is a valid
+    \Leftarrow: Assume $¬∃ T : ((p,q), T \atree)$
+      We show that $\mc R := \{ (p,q) \mid ¬∃ T : ((p,q), T \atree \}$ is a valid
       refinement relation. First $(p,q) ∈ \mc R$, and for any $(p,q) ∈ \mc R$:
       \begin{enumerate}
         \item If $p \may[a] p'$, then
             by inference rule 1 there exists $(p,q) \attack_a S$.
             From all $(p,q) \attack_a S$, choose the one where $S$ is minimal
-            with regard to the inclusion order. As $S ≠ ∅$, there is
-            $(p', q') ∈ S$ which was created from a transition $q \may[a] q'$.
-            Assuming $(p',q') \attack_a^* ∅$, by
-            lemma \ref{lemma:attack-associativity} we would get
-            $(p,q) \attack_a^* T ∪ ∅$ with $T ⊆ S ∖ \{p' q'\} ⊊ S$ in contradiction to the minimality
-            of $S$. So $¬((p',q') \attack_a^* ∅)$ and therefore $(p',q') ∈ \mc R$.
+            with regard to the inclusion order.
+            There exists $(p',q') ∈ S : ¬∃ T' : ((p',q'), T' \atree)$, because otherwise
+            there would be a $((p,q), T \atree)$. So this
+            $(p', q') ∈ S$ was created from a transition $q \may[a] q'$ and we have
+            $(p', q') ∈ \mc R$
         \item If $q \must[a] q'$, by similiar argument we get a transition
           $p \must[a] p'$ for which $(p',q') ∈ \mc R$.
       \end{enumerate}
@@ -238,8 +194,7 @@ The modal extension for a \emph{modal visibly pushdown automaton (mvPDA)} is str
 
 \begin{definition}[Attack rules for mvPDA]
   Let $(\Dmay, \Dmust)$ be an mvPDA.
-  We define a variant $ \attack_b$ of the attack sequences obtainable from the rewrite rules.
-  These are called \emph{attack rules}.
+  We define a \emph{attack rules} $(p,q) \attack_b S$  obtainable from the rewrite rules.
   For every $p,q ∈ \mc P$, we have:
   \begin{mathpar}
     \inferrule{(p, a, p') ∈ \Dmay}{(p,q) \attack_b \{ (p', q') \mid (q, a, q') ∈ \Dmay \}}
@@ -265,8 +220,8 @@ $|p| = |q| = 2$ and for any $(p',q') ∈ S$ that $1 ≤ |p'| = |q'| ≤ 3$.
 
 \begin{lemma}
   \label{lemma:attack-extension}
-  For an MTS generated by a mvPDA, if $(p, q) \attack_a^* S$, then
-  $(p⋅s,q⋅t) \attack_a^* S'$ with $S' = \{ (p'⋅s,q'⋅t) \mid (p', q') ∈ S\}$
+  For an MTS generated by a mvPDA, if $(p, q) \attack_a S$, then
+  $(p⋅s,q⋅t) \attack_a S'$ with $S' = \{ (p'⋅s,q'⋅t) \mid (p', q') ∈ S\}$
   for any $s,t ∈ \mc P$.
 \end{lemma}
 \begin{proof}
@@ -276,9 +231,7 @@ $|p| = |q| = 2$ and for any $(p',q') ∈ S$ that $1 ≤ |p'| = |q'| ≤ 3$.
   nameley $p⋅s \may[a] p'⋅s$ generated by the MTS induction rule 1.
   Also for every $q \must[a] q'$ there is just $q⋅t \may[a] q'⋅t$ from $q⋅t$.
   
-  Then the proposition is proved by induction on the length of $(p',q') \attack_a^* S'$:
-  \begin{enumerate}
-    \item The sequence has length 1:
+  % TODO update
       Then it is a single transition created from $p \may[a] p'$
       with $S = \{ (p', q') \mid q \may[a] q' \}$ and we get
       $p⋅s \may[a] p'⋅s$ and $\{ (p'⋅s, q'⋅t) \mid q⋅t \may[a] q'⋅t \} = S'$.
@@ -286,29 +239,19 @@ $|p| = |q| = 2$ and for any $(p',q') ∈ S$ that $1 ≤ |p'| = |q'| ≤ 3$.
       with $S = \{ (p', q') \mid p \must[a] p' \}$ and we get
       $\{ (p'⋅s, q'⋅t) \mid p⋅t \must[a] p'⋅t \} = S'$
       Both cases yield $(p⋅s,q⋅t) \attack_a^* S'$.
-    \item The sequence has length $n > 1$ and the induction hypothesis holds for
-      any sequence of length $< n$: Then
-      $(p',q') \attack_a^* \{ (p'', q'') \} \uplus S''$ and
-      $(p'',q'') \attack_a S'''$ with $S = S'' ∪ S'''$.
-      By induction hypothesis
-      $(p'⋅s,q'⋅t) \attack_a^* \{ (p''⋅s, q''⋅t) \} \uplus \{ (p'''⋅s, q'''⋅t \mid (p''',q'') ∈ S'' \}$ and
-      $(p''⋅s,q''⋅t) \attack_a \{ (p'''⋅s, q'''⋅t) \mid (p''',q''') ∈ S''' \}$.
-      Applying inference rule 4 for attack sequences yields
-      $(p⋅s,q⋅t) \attack_a^* \{ (p'''⋅s, q'''⋅t) \mid (p''',q''') ∈ S'' ∪ S''' \} = S'$
-  \end{enumerate}
 \end{proof}
 
 \begin{theorem}
   For an mvPDA $(\Dmay, \Dmust)$ with its induced MTS $(\mc P, \may[], \must[])$,
-  it holds that for any $P,S,Q,T ∈ Const$:
+  it holds that for any $P,S,Q,R ∈ Const$:
   \[
-    (P⋅S,Q⋅T) \attack_a^* ∅ \iff (P⋅S,Q⋅T) \attack_b ∅
+    ∃ T ((P⋅S,Q⋅R), T \atree) \iff (P⋅S,Q⋅T) \attack_b ∅
   \]
 \end{theorem}
 \begin{proof}
-    \Rightarrow: Assume $(P⋅S,Q⋅T) \attack_a^* ∅$ and let $(a_1, a_2, …, a_n)$ be
+    \Rightarrow: Assume $((P⋅S,Q⋅T), T \atree)$ and let $(a_1, a_2, …, a_n)$ be
       the linear form of a derivation of the attack sequence. Always
-      $a_1$ has the form $(P⋅S, Q⋅T) \attack_a S$ and $a_n$ the form
+      $a_1$ has the form $(P⋅S, Q⋅R) \attack_a S$ and $a_n$ the form
       $(p,q) \attack_a ∅$.
 
       Our proposition is that if we can split up the sequence into subsequences
@@ -343,7 +286,7 @@ $|p| = |q| = 2$ and for any $(p',q') ∈ S$ that $1 ≤ |p'| = |q'| ≤ 3$.
           %
       \end{enumerate}
     \Leftarrow:
-      We show that for $(p,q) \attack_b S$, there is $T ⊆ S$ with $(p,q) \attack_a^* T$
+      We show that for $(p,q) \attack_b ∅$, there is $((p,q), T \atree)$
       by induction on the inference of
       $(p,q) \attack_b S$:
       \begin{enumerate}
@@ -368,8 +311,8 @@ $|p| = |q| = 2$ and for any $(p',q') ∈ S$ that $1 ≤ |p'| = |q'| ≤ 3$.
           regard the $(p'⋅P,q'⋅Q) \attack_a^* T'''$ with $T''' ⊆ S'''$.
           Then with lemma \ref{lemma:attack-associativity} we get
           that there is $T ⊆ T' ∖ \{(p',q'\} ∪ T''' ⊆ S' ∪ S''' = S$ with $(p,q) \attack_a^* T$.
-        \item It was created by rule 4 from $(p,q) \attack_b \{(p',q')\} \uplus S'$ and
-          $(p',q') \attack_b S''$ with $S = S' ∪ S''$.
+        \item It was created by rule 4 from $(p,q) \attack_b \{(p',q')\} \uplus ∅$ and
+          $(p',q') \attack_b ∅$ with $ = S' ∪ S''$.
           Then by induction hypothesis there is $T' ⊆ \{(p',q')\} \uplus S'$ with
           $(p,q) \attack_a^* T'$ and $T'' ⊆ S''$ with $(p',q') \attack_a^* T''$.
           If $(p',q') ∉ T'$, then we get $T' ⊆ S' ⊆ S$.
