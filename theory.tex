@@ -118,14 +118,14 @@ the defender wins.
   transitions are \\
   \[
   Def((p, q, r)) = \begin{cases}
-    \{ (p', q', q \may[a] q' \} & \text{if }r = p \may[a] p' \\
-    \{ (p', q', p \must[a] p' \} & \text{if }r = q \must[a] q'
+    \{ (q \may[a] q', p', q') \mid q \may[a] q' \} & \text{if }r = p \may[a] p' \\
+    \{ (p \must[a] p', p', q') \mid p \must[a] p' \} & \text{if }r = q \must[a] q'
   \end{cases}
   \]
-  Then if $(p,q,r) ∈ Att$ and $(p,q,r') ∈ Def((p,q,r))$ we would
-  get an attack transition $(p,q) \attack (p',q')$
+  Then if $(p,q,r) ∈ Att$ and $(r',p',q') ∈ Def((p,q,r))$ we would
+  get an attack transition $(p,q) \attack[r,r'] (p',q')$.
 
-  With that we can define refinement by $p ≤_m q$, if there is a relation
+  With that we can say that $p ≤_m q$ if there is a relation
   $\mc R ⊆ \mc P × \mc P $ such that
   $(p, q) ∈ \mc R$ and for every $(p,q,r) ∈ Att$ if $(p, q) ∈ \mc R$ then there
   is $(p',q',r') ∈ Def((p,q,r))$ such that $(p',q') ∈ \mc R$.
@@ -134,26 +134,36 @@ the defender wins.
 
 \section{Attack tree}
 
-\begin{definition}[Attack transition and attack tree]
+\begin{definition}[Attack tree]
   Let $(\mc P, \may, \must)$ be an MTS.
-  An \emph{attack trees} is given by its node $(p, q, r) ∈ \mc P^2 × (\may ∪ \must)$,
-  a set of open edges $O ⊆ \mc P^2 × (\may ∪ \must)$ and set
-  of closed edges to children $C ⊆ \mc (P^2 × (\may ∪ \must)) × \mathcal T$ where
-  $\mc T$ is the set of trees. They are defined inductively by
-  
+
+  An \emph{attack tree} is a recursively defined rooted tree,
+  where each node has the values $(s, O, C)$
+  labeled with the attack transition $s ∈ Att$,
+  and each edge labeled with a defending transition leads to a child tree
+  or an element $\{(p',q')\}$
+  $O ⊆ Def(s)$ is a set of open edges labeled
+  and $C ⊆ Def(s) × \mc T$ is the set of closed edges labeled with a defending
+  transition and leading to a child tree in $\mc T$, the set of all trees.
+  They are defined inductively by
   \begin{mathpar}
-    \inferrule{(p,q,r) ∈ Att}
-      {((p,q, r), Def(p,q,r), ∅)}
+    \inferrule{s ∈ Att}
+      {(s, \{ (r, (p', q')) \mid (r', p', q') ∈ Def(s) \}) \atree}
     \, (1) \\
-%    \inferrule{p,q ∈ \mc P \\ p \may[a] p'}
-%      {((p,q, p \may[a] p'), \{ (p',q', q \may[a] q') \mid q \may[a] q' \}, ∅)}
-%    \, (1) \\
-%    \inferrule{p,q ∈ \mc P \\ q \must[a] q'}
-%      {((p,q), q \must[a] q', \{ (p', q', p \must[a] p') \mid p \must[a] p' \}, ∅)}
-%    \, (2) \\
-    \inferrule{((p, q, r), O \uplus (p', q', r'), C) \atree \\ ((p', q', r'), O', C') \atree}
-      {((p, q, r), O, C ∪ \{((p', q', r'), O', C')\}) \atree} \, (2) \\
+    \inferrule{(s, C \uplus (r', (p', q'))) \atree \\ T = ((p', q', r''), C') \atree}
+      {(s, C ∪ (r', T)) \atree}
+    \, (1) \\
+%    \inferrule{T \atree \\ ∃ n ∈ T : n = (s, C \uplus \{p',q')\} is a tree with a node N with an open edge to (p',q')
+%    and T' is a tree with root (p',q')}
+%    {T'' is a tree obtained by replacing the node N with a node having the
+%    open edge replaced by an edge to T'}
+    \inferrule{(s, O \uplus (r', p', q'), C) ∈ \mc T \\ ((p', q', r''), O', C') ∈ \mc T}
+      {(s, O, C ∪ \{(r', (p', q', r''), O', C')\}) \in \mc T} \, (2) \\
   \end{mathpar}
+%  An \emph{attack tree} is given by its node $(p, q, r) ∈ $,
+%  a set of open edges $O ⊆ \mc P^2 × (\may ∪ \must)$ and set
+%  of closed edges to children $C ⊆ \mc (P^2 × (\may ∪ \must)) × \mathcal T$ where
+%  $\mc T$ is the set of trees. They are defined inductively by
   
   The root of an attack tree is $root((p,q,r),O,C) = (p,q)$
 
@@ -171,6 +181,14 @@ the defender wins.
   For a closed attack tree, we can define
   a) a node $c$ is a child of $r$ if there is a non-empty path from $r$ to $c$.
   
+  A partition $P$ of a tree is given by a set of nodes $P = \{T_1, …, T_n\}$.
+  The part represented by $T_i ∈ P$ is the node $T_i$ and all nodes that are successors
+  of $T_i$ but not of another $T_j ∈ P$.
+
+  $(p,q) \attack_b S$ is said to represent a partition $T$ if
+  $∃ s,t ∈ \mc P$ such that $(p⋅s,q⋅t) = T$ and
+  with $C = \{ T' ∈ P \mid T \attack T' \}$ $\{(p⋅s,q⋅t) | (p,q) ∈ S \} = C$.
+
   b) a subtree
   as a tupel $(r,C)$ where $r$ is a node in the tree and $C$ is a set of
   nodes such that each $c ∈ C$ is a child of $r$ but no child of another $c ∈ C$.
@@ -245,8 +263,6 @@ the defender wins.
         \item $(p',q',r') ∈ open(T''')$
       \end{enumerate}
   \end{enumerate}
-  % TODO proof
-  % TODO attacking transition, defending transition
 \end{proof}
 
 \begin{theorem}
@@ -258,10 +274,11 @@ the defender wins.
 \end{theorem}
 
 \begin{proof}
-    \Rightarrow: Assume $p ≤_m q$. Then there is a refinement relation $\mc R$.
-      Let $T = ((p, q, r), O, C) \atree$ be a closed attack tree.
+    \Rightarrow: Assume $p ≤_m q$. Then there is a refinement relation $\mc R$
+      with $(p,q) ∈ \mc R$.
+      Asumme $T = ((p, q, r), O, C) \atree$ is a closed attack tree.
       As it has no open edges, we have $O = ∅$ and also all $T' ∈ C$ are closed.
-      We show by induction on $|C|$ that $(p, q) ∉ R$:
+      We show by induction on $|C|$ that $(p, q) ∉ R$, resulting in a contradiction:
       \begin{enumerate}
         \item $|C| = 0$: Then there is an attacking rule $r$, but no
           defending rule, therefore $(p,q) ∉ \mc R$.
@@ -375,42 +392,39 @@ The modal extension for a \emph{modal visibly pushdown automaton (mvPDA)} is str
 \end{theorem}
 \begin{proof}
     \Rightarrow: Assume $T$ to be closed tree with $root(T) = (P⋅S,Q⋅T)$.
-    
-      the linear form of a derivation of the attack sequence. Always
-      $a_1$ has the form $(P⋅S, Q⋅R) \attack_a S$ and $a_n$ the form
-      $(p,q) \attack_a ∅$.
 
-      Our proposition is that if we can split up the sequence into subsequences
-      which we can all compute seperately, we can also compute the whole sequence.
-      More formally, we want to show that if there is a
-      set of $k+1$ indices $I = {i_0,…,i_k}$ where
+      We show that for any partition of the tree $P = \{T_1, …, T_n\}$ where
+      every $T_i$ is represented by a rule $b_i$, there is
+      an attack rule representing the whole tree.
+      Proof by induction over the length of the partition $n$:
       \begin{enumerate}
-        \item $0 = i_0 < i_1 < i_2 < … < i_{k-1} < i_k = n$.
-        \item There is a sequence $(b_1, …, b_k)$ where
-          each $b_i$ is an attack rule $(p,q) \attack_b S$.
-        \item For every $i,j ∈ I$ with $i<j$ the sequence $(a_{i+1},…,a_j)$, which
-          generates the attack sequence $(p,q) \attack_a^* S$, the representing rule
-          $b_j$ is $(p,q) \attack_b S$
-          If $j < n$ then with $b_i = (p',q') \attack_b S'$ we require $(p',q') ∈ S'$.
-          and if $j = n$ then $S = ∅$.
-      \end{enumerate}
-      there is $(P⋅S,Q⋅T) \attack_b ∅$.
+        \item $n = 1$: Then $T_1 = T$ and $b_1$ represents $T$.
+        \item $n > 1$: WLOG let $T_1 = (P⋅S, Q⋅T, r)$
+          be the partition at the root of the tree $T$ with succeding partitions $C$.
+          
+          As $n > 1$, there is $(p', q', r') ∈ C$.
+          Then for $b_1 = (P⋅S,Q⋅T) \attack_b S$ we have by representation
+          $(p', q') ∈ S$
+          and we have $|p'| = |q'| ≥ 2$, as otherwise the rule $r'$ would
+          not be applicable from the state $(p', q')$. So $b_1$ is a left-hand side rule.
 
-      We prove this by induction on the number $k$:
+          For every partition $T_i$ with no succeding partitions, we have
+          $b_i = (p,q) \rightarrow ∅$, so that is a right-hand side rule.
 
-      \begin{enumerate}
-        \item $k=1$: Then the indices are $0, n$ and the rule sequence $(b_1)$
-          represents $(a_1, …, a_n)$ generating $(P⋅S, Q⋅T) \attack_a^* ∅$.
-          Then we have $(P⋅S, Q⋅T) \attack_b ∅$.
-        \item $k > 1$, and the induction hypothesis holds for any $k' < k$:
-          Let $(b_1, …, b_k)$ be the rule sequence.
-          For the first rule $b_1 = (P⋅S,Q⋅T) \attack_b S$, there
-          is be $(p',q') ∈ S$ with $|p'| = |q'| ≥ 2$ because otherwise no more rules
-          could be applied afterwards, in contradiction to $k > 1$.
-          So this is a left-hand side rule.
-          Also the last rule $b_k = (p',q') \attack_b ∅$ is a right-hand side rule.
-          %
+          Then by following the successors of the partitions from $T_1$, we will eventually
+          come to a partition $T_i$ followed by a partition
+          $T_j$ such that
+          $b_i$ is a left-hand side rule and $b_j$ is a right-hand side rule.
+          
+          Then by rule 3 or 4 we can combine $b_i$ and $b_j$ into a new rule $b_0$.
+          This rule represents the partition $T_i$ in $P' = P ∖ \{T_j\}$. Every
+          other $T_k ∈ P'$ remains unchanged and is still represented by $b_k$.
+          Then by induction hypothesis there is a $b$ representing $T$.
+
       \end{enumerate}
+
+      %show: every closed tree has a partition with a representation by b_i
+      
     \Leftarrow:
       We show that for $(p,q) \attack_b S$, there is a tree
       $T = ((p,q,r), O, C) \atree$ such that
