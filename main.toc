@@ -6,7 +6,7 @@
 \contentsline {section}{\numberline {2.4}Modal process rewrite system}{3}{section.2.4}
 \contentsline {section}{\numberline {2.5}Modal refinement}{4}{section.2.5}
 \contentsline {section}{\numberline {2.6}Attack tree}{4}{section.2.6}
-\contentsline {section}{\numberline {2.7}Visibly pushdown automaton}{5}{section.2.7}
+\contentsline {section}{\numberline {2.7}Visibly pushdown automaton}{6}{section.2.7}
 \contentsline {chapter}{\numberline {3}Algorithms}{9}{chapter.3}
 \contentsline {section}{\numberline {3.1}Description}{9}{section.3.1}
 \contentsline {section}{\numberline {3.2}Soundness and completeness}{11}{section.3.2}
