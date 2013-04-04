@@ -172,3 +172,54 @@ Obviously $\mc B ⊆ \mc C$. % TODO
         \item $(p',q') ∈ open(T''')$
       \end{enumerate}
   \end{enumerate}
+
+
+
+
+
+
+
+\begin{lemma}
+  \label{lemma:attack-to-tree}
+  If $(p,q) \attack S$, then there is a tree
+  $T$ with $root(T) = (p,q)$ and $open(T) = S$.
+\end{lemma}
+\begin{proof}
+  By induction on the construction of $(p,q) \attack S$:
+  \begin{enumerate}
+    \item It was constructed by rule 1 from $(p, a, p') ∈ \Dmay$. Then there is
+      an attacking transition $p \may[a] p'$ and 
+      for every $(q, a, q') ∈ \Dmay$ there is an induced defending transition
+      $q \may[a] q'$.
+      Then $S = \{ (p',q') | q \may[a] q' \}$ and by attack tree inference rule 1
+      there is $T = ((p, q), S, ∅)$ with $open(T) = S$.
+    \item It was constructed by rule 2 from $(q, a, q') ∈ \Dmust$. Then there is
+      an attacking transition $q \must[a] q'$ and 
+      for every $(p, a, p') ∈ \Dmay$ there is an induced defending transition
+      $p \must[a] p'$.
+      Then $S = \{ (p',q') | p \may[a] p' \}$ and by attack tree inference rule 2
+      there is $T = ((p, q), S, ∅)$ with $open(T) = S$.
+    \item It was constructed by rule 3 from
+      $(p,q) \attack \{(p'⋅P,q'⋅Q)\} \uplus S''$ and
+      $(p',q') \attack S'$ with $S = S'' ∪ S'''$ and
+      $S''' = \{  (p''⋅P, q''⋅Q) \mid (p'',q'') ∈ S' \}$.
+      Then by induction hypothesis there is
+      a tree $T'$ with $root(T') = (p',q')$ and $open(T') = S'$ and
+      a tree $T''$ with $root(T'') = (p,q)$ and $open(T'') = S'' \uplus \{(p'⋅P,q'⋅Q)\}$.
+      By appying lemma \ref{lemma:tree-lift} on $T'$ there is a tree
+      $T'''$ with $root(T''') = (p'⋅P,q'⋅Q)$,
+      $open(T''') = O''' \uplus \{(p'⋅P,q'⋅Q)\}$ and
+      $O''' = \{ (p''⋅P, q''⋅Q) \mid (p'',q'') ∈ S' \} = S'''$.
+      By applying lemma \ref{lemma:tree-composition} on $T''$ and $T'''$ there is
+      a tree $T$ with $root(T) = (p,q)$ and $open(T) = S'' ∪ S''' = S$.
+    \item It was constructed by rule 4 from
+      $(p,q) \attack S'' \uplus \{(p',q')\} $ and
+      $(p',q') \attack S'$ with $S = S'' ∪ S'$.
+      Then by induction hypothesis there is
+      a tree $T'$ with $root(T') = (p',q')$ and $open(T') = S'$ and
+      a tree $T''$ with $root(T'') = (p,q)$ and $open(T'') = S'' \uplus \{(p',q')\}$.
+      By applying lemma \ref{lemma:tree-composition} on $T'$ and $T''$ there is
+      a tree $T$ with $root(T) = (p,q)$ with $open(T) = S'' ∪ S' = S$.
+  \end{enumerate}
+\end{proof}
+

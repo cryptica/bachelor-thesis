@@ -162,21 +162,9 @@ An mPRS $(\Dmay, \Dmust)$ induces an MTS $(\mc P, \may[], \must[])$ as follows:
     \inferrule{p,q ∈ \mc P, q \must[a] q'}
       {((p,q), \{ (p', q') \mid p \must[a] q' \}, ∅) ∈ \mc T}
     \, (2) \\
-    \inferrule{((p,q), O \uplus (p', q'), C) ∈ \mc T \\ T = (p', q'), O', C') ∈ \mc T}
-      {(s, O, C ∪ T) ∈ \mc T}
+    \inferrule{((p,q), O \uplus (p', q'), C) ∈ \mc T \\ T = ((p', q'), O', C') ∈ \mc T}
+      {(s, O, C ∪ \{T\}) ∈ \mc T}
     \, (3) \\
-%    \inferrule{(p,q,r) ∈ Att}
-%      {((p,q), \{ (p', q') \mid (r', p', q') ∈ Def(s) \}, ∅) \atree}
-%    \, (1) \\
-%    \inferrule{((p,q), O \uplus (p', q'), C) \atree \\ T = (p', q'), O', C') \atree}
-%      {(s, O, C ∪ T) \atree}
-%    \, (2) \\
-%    \inferrule{T \atree \\ ∃ n ∈ T : n = (s, C \uplus \{p',q')\} is a tree with a node N with an open edge to (p',q')
-%    and T' is a tree with root (p',q')}
-%    {T'' is a tree obtained by replacing the node N with a node having the
-%    open edge replaced by an edge to T'}
-    \inferrule{(s, O \uplus (r', p', q'), C) ∈ \mc T \\ ((p', q', r''), O', C') ∈ \mc T}
-      {(s, O, C ∪ \{(r', (p', q', r''), O', C')\}) \in \mc T} \, (2) \\
   \end{mathpar}
 %  An \emph{attack tree} is given by its node $(p, q, r) ∈ $,
 %  a set of open edges $O ⊆ \mc P^2 × (\may ∪ \must)$ and set
@@ -190,11 +178,17 @@ An mPRS $(\Dmay, \Dmust)$ induces an MTS $(\mc P, \may[], \must[])$ as follows:
   to an attacking transition applicable from that state, while the set of edges from that node
   corresponds exactly to the defending transition applicable from that state and attacking transition.
 
-  For an attack tree $T = ((p,q),O,C)$, the root is given by $root(T) = (p,q)$.
-  The tree has two kinds of leaves, open and closed ones. For the set
-  of \emph{open leaves} we have
-  $open(((p,q,r), O, C)) = O ∪ ⋃_{T' ∈ C} open(T')$.
-  We say that a tree is \emph{closed} if it has no open leaves, that is
+  For an attack tree $T = ((p,q),O,C)$, the root is given by $root(T) = (p,q)$,
+  the open edges by $openedge(T) = O$ and closed edges by $closededge(T) = C$. % TODO better names
+
+  The \emph{subtrees} of $T$ are given recursively by
+  $subtree(T) = T ∪ ⋃_{T' ∈ closededge(T)} subtree(T')$.
+  
+  The set of \emph{open states} of $T$ are the states that
+  have an open edge to it, that is
+  $open(T) = ⋃_{T' ∈ subtree(T)} openedge(T')$.
+  
+  We say that a tree is \emph{closed} if it has no open states, that is
   $closed(T)$ \iff $open(T) = ∅$.
 
   %The set of successors from the root node of a tree is given by
@@ -220,22 +214,51 @@ An mPRS $(\Dmay, \Dmust)$ induces an MTS $(\mc P, \may[], \must[])$ as follows:
 
 \begin{lemma}
   \label{lemma:tree-composition}
-  If there are attack trees $T$ with $root(T) = (p,q)$ and
-  $R$ with $root(R) = (p',q')$ and $(p',q') ∈ open(T)$,
+  If there are attack trees $T$ and $R$ with
+  $root(R) ∈ open(T)$,
   then there is an attack tree $S$ with
-  $root(S) = (p,q)$ and $open(S) = open(T) ∖ \{(p', q')\} ∪ open(R)$
-\end{lemma}
-\begin{lemma}
-  \label{lemma:tree-composition2}
-  If there are attack trees $T = ((p,q), O, C)$ and
-  $R = ((p',q'), O', C')$ with $(p',q') ∈ open(T)$,
-  then there is an attack tree $S$ with
-  $S = ((p,q), O' ∖ \{p',q'\}, C'')$ with
-  $open(S) = open(T) ∖ \{(p', q')\} ∪ open(R)$
+  $root(S) = root(T)$ and
+  $open(S) = open(T) ∖ \{root(R)\} ∪ open(R)$
 \end{lemma}
 \begin{proof}
-  We prove the proposition by induction on $T$:
+  For every subtree $T' ∈ subtree(T)$
+  with $(p',q') ∈ openedge(T')$, we can construct
+  $S' = ((p'',q''), openedge(T') ∖ \{(p',q')\}, closededge(T') ∪ open(R)$ with
+  $open(S') = openedge(T) ∖ \{(p',q')\} ∪ open(R)$.
+  Th tree $S'$ can be added as a subtree whenever $T'$ could be,
+  be used in the construction rules as $T$.
+  $open(S) = ⋃_{S' ∈ subtree(S)} openedge(S')$
+  $open(S) = ⋃_{T' ∈ subtree(T)} openedge(T') ∖ \{(p',q')\} ∪ open(R)$.
+  $= (⋃_{T' ∈ subtree(T)} openedge(T')) ∖ \{(p',q')\} ∪ open(R)$.
+  $= open(T) ∖ \{(p',q')\} ∪ open(R)$.
+\end{proof}
+\begin{proof}
+  We prove the proposition by induction on the number of subtrees
+  with an open edge to $(p',q')$, that is
+  $n = |\{T' ∈ subtree(T) \mid (p',q') ∈ open(T') \}|$:
   \begin{enumerate}
+    \item $n = 0$:
+      Then
+      $root(R) ∈ openedge(T)$ and $root(T) ∉ open(T')$ for $T' ∈ closededge(T)$
+      and we can construct
+      $S = ((p,q), openedge(T) ∖ \{root(R)\}, closededge(T) ∪ \{R\})$ with
+      $open(S) = open(T) ∖ \{root(R)\} ∪ open(R)$
+    \item $n ≥ 1$:
+      
+      Then there is $T' ∈ closededge(T)$ such that $root(R) ∈ open(T')$.
+      By induction hypothesis there is
+      $S'$ with $root(S') = root(T')$ and
+      $open(S') = open(T') ∖ \{root(R)\} ∪ open(R)$
+      
+      and a $T''$ with $root(T') ∈ openedge(T'')$ and
+      $closededge(T'') = closededge(T) ∖ \{T'\}$.
+
+      Then we can construct
+      $S = (root(T), openedge(T) ∖ root(T'), closededge(T) ∖ \{T'\} ∪ \{S'\}$
+      with
+      $open(S) = open(T) ∖ \{root(R)\} ∪ open(R) ∪ open(S)$
+
+      with $(p',q') ∈ open(T)$ and we can construct
     \item $T = ((p,q), O, ∅)$:
       Then $(p',q') ∈ O$ and we can construct
       $S = ((p,q), O ∖ \{(p',q')\}, \{R\}$ with
@@ -288,33 +311,36 @@ An mPRS $(\Dmay, \Dmust)$ induces an MTS $(\mc P, \may[], \must[])$ as follows:
       Let $r$ be the attacking transition corresponding to $(p,q)$ in $T$.
       For every fitting defending transition $r'$ to $(p',q')$ there is an edge
       from $(p,q)$ to $(p',q')$.
-      As $T$ is closed, with $open(T) = O ∪ ⋃_{T'∈C}open(T') = ∅$ we get $O = ∅$
-      and every $T'$ is closed.
+      As $T$ is closed, we get $openedge(T) = ∅$
+      and every $T' ∈ closededge(T)$ is also closed.
 
-      Now we show the proposition by induction over the number of children $|C|$:
+      Now we show the proposition by induction over the number of subtrees
+      $n = |subtrees(T)|$:
       \begin{enumerate}
-        \item $|C| = 0$: Then there is an attacking transition, but no
+        \item $n = 0$: Then $closededge(T) = ∅$ and there is an attacking transition, but no
           defending transition, therefore $(p,q) ∉ \mc R$.
-        \item $|C| ≥ 1$:
+        \item $n ≥ 1$:
           Then there is an attacking rule, and for every defending transition leading
           to $(p',q')$, there is an edge to a closed tree $T'$ with $root(T') = (p',q')$.
-          By induction hypothesis we have $(p',q') ∉ \mc R$ and therefore $(p,q) ∉ \mc R$.
+          $T'$ is a proper subtree of $T$ and has less subtrees, so
+          by induction hypothesis we have $(p',q') ∉ \mc R$ and therefore $(p,q) ∉ \mc R$.
       \end{enumerate}
     \Leftarrow: Assume there is no closed attack tree $T$ with $root(T) = (p,q)$.
       To show $p ≤_m q$, we show that $\mc R := \{ (p',q') \mid ¬∃ T : root(T) = (p',q') ∧ closed(T) \}$ is a valid
       refinement relation with $(p,q) ∈ \mc R$.
 
       For any attacking transition $r$ and $(p,q) ∈ \mc R$,
-      by inference rule 1 or 2 there exists an attacking tree $T = ((p,q), O, C)$.
-      From all such $T$ with $root(T) = (p,q)$, choose one where $O$ is minimal
+      by inference rule 1 or 2 there exists an attacking tree $T$ with
+      $root(T) = (p,q)$.
+      From all such $T$ with $root(T) = (p,q)$, choose one where $openedge(T)$ is minimal
       with regard to the inclusion order.
-      There exists $(p',q') ∈ O$ with $(p',q') ∈ \mc R$, because otherwise
+      There exists $(p',q') ∈ openedge(T)$ with $(p',q') ∈ \mc R$, because otherwise
       there would be a closed attack tree $T'$ with $root(T') = (p',q')$ and
       by inference rule 3 we would get
-      $T'' = ((p,q), O'', C ∪ T')$ with $O'' = O ∖ \{(p',q')\} ⊊ O$
+      $T'' = (root(T), openedge(T'') ∖ \{p',q'\}, closededge(T) ∪ \{T'\})$ with $openedge(T'') = openedge(T) ∖ \{(p',q')\} ⊊ openedge(T)$
       in contradiction to the minimality of $O$.
-      So for the attacking transition $(p,q)$ there is a defending transition
-      $(p',q')$ with $(p',q') ∈ \mc R$.
+      So for the attacking transition from $(p,q)$ there is a defending transition
+      to $(p',q')$ with $(p',q') ∈ \mc R$.
 \end{proof}
 
 % tree used to decide refinement
@@ -416,69 +442,51 @@ mPRS $(\Dmay, \Dmust)$ such that $\Dmust$ is a vPDA.
   \end{enumerate}
 \end{proof}
 
-\begin{definition}[Tree represented by an attack rule]
-  A tree $T$ is said to be \emph{represented} by an
-  attack rule $(p,q) \attack S$ if there exist $s,t ∈ \mc P$
-  such that $root(T) = (p⋅s,q⋅t)$
-  and $open(T) = \{ (p'⋅s,q'⋅t) \mid (p',q') ∈ S \}$
+\begin{definition}[Partial subtree]
+  A tree $S$ is a partial tree of $T$, if
+  $openedge(R) ⊆ openedge(S)$ and
+  for every $T' ∈ closededge(T)$,
+  either $root(T') ∈ openedge(S)$ or
+  there is a $S' ∈ closededge(T)$
+  such that $S'$ is partial tree of $T'$.
+  
+  if there is $R ∈ subtree(T)$ with
 \end{definition}
 
 \begin{definition}[Partition of an attack tree]
-  A set of attack trees $P ⊆ \mc T$ is a \emph{partition} of
-  an attack tree $T$ if there is $R ∈ P$ with $root(R) = root(T)$
-  and for all $R ∈ P$:
+  A partition $P$ of an attack tree $T$ is given by a set
+  of subtrees $P ⊆ subtree(T)$
+  such that there is $R ∈ P$ with $root(R) = root(T)$ and for all $R ∈ P$:
   \begin{enumerate} 
-    \item For every leaf $R' ∈ leafs(P)$: Either $R'$ is a leaf
-      of $T$ or $R' = R''$ for some $R'' ∈ P$.
-    %\item $R$ is a subtree of $T$. % define subtree
-    %\item With $S = \{ root(R') \mid R' ∈ P ∧ R'\text{ is descendant of }R ∧ R' ≠ R\}$
-    %  being the descendants of $R$, not including itself, then $open(R) = S$
+    \item For every open state $R' ∈ open(P)$: Either $R' ∈ open(T)$ or
+      $R' = R''$ for some $R'' ∈ P$.
   \end{enumerate}
+  
+  with $T ∈ P$.
+
+%  For $R_1,R_2 ∈ P$, we define a partial ordering
+%  $R_1 ≤ R_2 \iff R_2 ∈ subtree(R_1)$ and
+  define the successors of $R ∈ P$ as
+  $succ(R) = \{ R' ∈ P \mid R' ∈ subtree(R) ∧ R ≠ R' \}$.
+
+%  A set of attack trees $P ⊆ \mc T$ is a \emph{partition} of
+%  an attack tree $T$ if there is $R ∈ P$ with $root(R) = root(T)$
+%  and for all $R ∈ P$:
+%  \begin{enumerate} 
+%    \item Either $root(R) = root(T)$, or $root(R) ∈ open(R')$ for
+%      some $R' ∈ P$.
+%    \item For every open state $R' ∈ open(P)$: Either $R' ∈ open(T)$ or
+%      $R' = R''$ for some $R'' ∈ P$.
+%  \end{enumerate}
 \end{definition}
 
-\begin{lemma}
-  \label{lemma:attack-to-tree}
-  If $(p,q) \attack S$, then there is a tree
-  $T$ with $root(T) = (p,q)$ and $open(T) = S$.
-\end{lemma}
-\begin{proof}
-  By induction on the construction of $(p,q) \attack S$:
-  \begin{enumerate}
-    \item It was constructed by rule 1 from $(p, a, p') ∈ \Dmay$. Then there is
-      an attacking transition $p \may[a] p'$ and 
-      for every $(q, a, q') ∈ \Dmay$ there is an induced defending transition
-      $q \may[a] q'$.
-      Then $S = \{ (p',q') | q \may[a] q' \}$ and by attack tree inference rule 1
-      there is $T = ((p, q), S, ∅)$ with $open(T) = S$.
-    \item It was constructed by rule 2 from $(q, a, q') ∈ \Dmust$. Then there is
-      an attacking transition $q \must[a] q'$ and 
-      for every $(p, a, p') ∈ \Dmay$ there is an induced defending transition
-      $p \must[a] p'$.
-      Then $S = \{ (p',q') | p \may[a] p' \}$ and by attack tree inference rule 2
-      there is $T = ((p, q), S, ∅)$ with $open(T) = S$.
-    \item It was constructed by rule 3 from
-      $(p,q) \attack \{(p'⋅P,q'⋅Q)\} \uplus S''$ and
-      $(p',q') \attack S'$ with $S = S'' ∪ S'''$ and
-      $S''' = \{  (p''⋅P, q''⋅Q) \mid (p'',q'') ∈ S' \}$.
-      Then by induction hypothesis there is
-      a tree $T'$ with $root(T') = (p',q')$ and $open(T') = S'$ and
-      a tree $T''$ with $root(T'') = (p,q)$ and $open(T'') = S'' \uplus \{(p'⋅P,q'⋅Q)\}$.
-      By appying lemma \ref{lemma:tree-lift} on $T'$ there is a tree
-      $T'''$ with $root(T''') = (p'⋅P,q'⋅Q)$,
-      $open(T''') = O''' \uplus \{(p'⋅P,q'⋅Q)\}$ and
-      $O''' = \{ (p''⋅P, q''⋅Q) \mid (p'',q'') ∈ S' \} = S'''$.
-      By applying lemma \ref{lemma:tree-composition} on $T''$ and $T'''$ there is
-      a tree $T$ with $root(T) = (p,q)$ and $open(T) = S'' ∪ S''' = S$.
-    \item It was constructed by rule 4 from
-      $(p,q) \attack S'' \uplus \{(p',q')\} $ and
-      $(p',q') \attack S'$ with $S = S'' ∪ S'$.
-      Then by induction hypothesis there is
-      a tree $T'$ with $root(T') = (p',q')$ and $open(T') = S'$ and
-      a tree $T''$ with $root(T'') = (p,q)$ and $open(T'') = S'' \uplus \{(p',q')\}$.
-      By applying lemma \ref{lemma:tree-composition} on $T'$ and $T''$ there is
-      a tree $T$ with $root(T) = (p,q)$ with $open(T) = S'' ∪ S' = S$.
-  \end{enumerate}
-\end{proof}
+\begin{definition}[Part represented by an attack rule]
+  A subtree $R ∈ P$ in a partition
+  is said to be \emph{represented} by an
+  attack rule $(p,q) \attack S$ if there exist $s,t ∈ \mc P$
+  such that $root(T) = (p⋅s,q⋅t)$
+  and $\{ root(R') \mid R' ∈ succ(R) \} = \{ (p'⋅s,q'⋅t) \mid (p',q') ∈ S \}$
+\end{definition}
 
 \begin{theorem}
   \label{theorem:tree-attack}
@@ -491,7 +499,7 @@ mPRS $(\Dmay, \Dmust)$ such that $\Dmust$ is a vPDA.
 \begin{proof}
     \Rightarrow: Assume $T$ to be closed tree with $root(T) = (P⋅S,Q⋅T)$.
 
-      We show that if there is a $n$ rules $(a_1, …, a_n\}$ such that
+      We show that if there is a $n$ rules $\{a_1, …, a_n\}$ such that
       there is a partition $\{R_1, …, R_n\}$ of $T$ with each $R_i$ being
       represented by $a_i$, then there is a rule representing $T$.
 
@@ -499,29 +507,26 @@ mPRS $(\Dmay, \Dmust)$ such that $\Dmust$ is a vPDA.
       
       \begin{enumerate}
         \item $n = 1$: Then $R_1 = T$ and $a_1$ represents $T$.
-        \item $n > 1$: WLOG let $R_1$
-          be the part at the root of the tree $T$ with $root(R) = (P⋅S, Q⋅T)$
-          Let $C$ be the direct descendants of $R$.
+        \item $n > 1$:
+          Let $R_1$ be the subtree with $root(R) = (P⋅S, Q⋅T)$
           
-          As $n > 1$, there is $R' ∈ C$ with $root(R') = (p',q')$.
+          As $n > 1$, there is $R' ∈ succ(R)$ with $root(R') = (p',q')$.
           Then for $a_1 = (P⋅S,Q⋅T) \attack S$ we have by representation
-          $(p', q') ∈ S$.
+          $root(R') ∈ S$.
           
-          We have $|p'| = |q'| ≥ 2$, as otherwise the we would have $(p',q') = (P,Q)$
-          and there is no rule applicable from that state, therefore $R'$ would not exist.
-          So $b_1$ is a left-hand side rule.
+          We have $|p'| = |q'| ≥ 2$, as otherwise
+          there would be no rule applicable from that state and therefore $R'$ would not exist.
+          So $a_1$ is a left-hand side rule.
 
-          For every part $R_i$ with no direct descendants, we have
-          $open(R_i) = ∅$ and therefore $a_i = (p,q) \rightarrow ∅$,
-          so that is a right-hand side rule.
-          Every path in $T$ eventually leads to such a part.
+          For every subtree $R ∈ P$ with $succ(R) = ∅$,
+          we have $a_i = (p,q) \rightarrow ∅$, so that is a right-hand side rule.
+          Every path in $T$ eventually leads to such a subtree.
 
-          Then by following the successors of the parts from $T_1$, we will eventually
-          come to a partition $R_i$ succeded by a partition $R_j$ such that
+          Then by following the successors of the subtrees from $R_1$, we will eventually
+          come to a subtree $R_i$ succeded by a partition $R_j$ such that
           $b_i$ is a left-hand side rule and $b_j$ is a right-hand side rule.
-          
-          Then by rule 3 or 4 we can combine $b_i$ and $b_j$ into a new rule $b_0$.
-          And as $root(R_j) ∈ open(R_i)$,
+
+          As $R_j ∈ succ(R_i)$,
           by lemma \ref{lemma:tree-composition}
           we get a tree $R_0$ with $root(R_0) = root(R_i)$ and
           $open(R_0) = open(R_i) ∖ \{ root(R_j) \} ∪ open(R_j)$.
