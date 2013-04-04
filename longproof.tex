@@ -123,3 +123,52 @@ Obviously $\mc B ⊆ \mc C$. % TODO
 \end{proof}
 
 
+
+
+
+
+
+  By induction on $|open(T)|$
+  \begin{enumerate}
+    \item $|open(T)| = 1$:
+      If $(p',q') ∈ O$ 
+      we can create $S = ((p,q), O ∖ \{(p', q')\}, R) \atree$
+      with $open(S) = open(T) ∖ \{(p', q')\} ∪ open(R)$
+      Otherwise $(p',q') ∈ T'$ for $T' ∈ C$
+
+      T = ((p,q), O, ∅)$:
+    \item $T = ((p,q), O, C ∪ T')$:
+      Then $T$ was created from
+      $T'' = ((p,q), O' \uplus \{(p'',q'')\}, C) \atree$ and
+      $T' = ((p'',q''), ␣, ␣) \atree$.
+
+      If $(p',q') ∈ O$
+      As $open(T) = open(T'') ∖ \{(p'',q'')\} ∪ open(T')$,
+      we could have the cases
+      \begin{enumerate}
+        \item $(p',q') = (p'',q'')$:
+        \item $(p',q') ∈ open(T')$:
+          With the induction hypothesis
+          from $T'$ and $R$ we get a tree
+          $S' = ((p'',q''), ␣, ␣) \atree$ with
+          $open(S') = (open(T') ∖ \{ (p',q') \} ) ∪ open(R)$
+          Then we can combine $T''$ and $S'$ to
+          $S = ((p,q), O', C ∪ S') \atree$ with
+          $open(S) = O' ∪ (⋃_{T'∈C}open(T')) ∪ open(S') =
+                     O' ∪ (⋃_{T'∈C}open(C)) ∪ ((open(T') ∖ \{ (p',q') \} ) ∪ open(R)) = 
+                     (O' ∪ (⋃_{T'∈C}open(C)) ∪ (open(T')) ∖ \{ (p',q') \} ) ∪ open(R) = 
+                     (open(T) ∖ \{ (p',q') \} ) ∪ open(T'))$
+        \item $(p',q') ∉ open(T')$: Then $(p',q') ∈ open(T'') ∖ \{(p'',q'')\}$.
+          By induction hypothesis
+          from $T''$ and $T'$ we get a tree
+          $S' = ((p'',q''), O''', C''') \atree$ with
+          $open(S') = (open(T'') ∖ \{ (p',q') \} ) ∪ open(T')$.
+          Then we can combine $T'''$ and $S'$ to
+          $S = ((p,q), O', C ∪ S') \atree$ with
+          $open(S) = O' ∪ (⋃_{T'∈C}open(C)) ∪ open(S') =
+                     O' ∪ (⋃_{T'∈C}open(C)) ∪ ((open(T'') ∖ \{ (p',q') \} ) ∪ open(T')) = 
+                     (O' ∪ (⋃_{T'∈C}open(C)) ∪ (open(T'')) ∖ \{ (p',q') \} ) ∪ open(T') = 
+                     (open(T) ∖ \{ (p',q') \} ) ∪ open(T'))$
+        \item $(p',q') ∈ open(T''')$
+      \end{enumerate}
+  \end{enumerate}
