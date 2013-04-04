@@ -6,16 +6,16 @@
 
 % pseudocode
 \begin{figure}[ht]
-\caption{Algorithm for calculating the attack rules on mvPDAs}
+\caption{Algorithm for calculating the basic attack rules on mvPDAs}
 \begin{algorithmic}[1]
 \Function{AttackRules}{$mvPDA = (\Dmay, \Dmust)$}
   \State $rules ← ∅$
-  \For{$P,Q,S,T ∈ Const(mvPDA), a ∈ Act(mvPDA), type ∈ \{\text{may},\text{must}\}$}
+  \For{$P,Q,S,T ∈ Const, a ∈ Act, type ∈ \{\text{may},\text{must}\}$}
     \If{$type = \text{may}$}
       \State $lhs ← (P⋅S, Q⋅T)$
       \Comment{Attack from left-hand side for may rules}
     \Else
-      \State $lhs ← (Q⋅S, P⋅Y)$
+      \State $lhs ← (Q⋅T, P⋅S)$
       \Comment{Attack from right-hand side for must rules}
     \EndIf
     %\State $lhs ← (p, q)(X, Y)$
@@ -57,7 +57,7 @@
 \caption{Refinement algorithm for mvPDAs}
 \begin{algorithmic}[1]
 \Function{VPDARefinement}{$P⋅S, Q⋅T, mvPDA$}
-  \Comment{$P⋅S ≤_m Q⋅T$ given $mvPDA$}
+  \Comment{$P⋅S ≤_m Q⋅T$}
   \State $initial ← [P⋅S, Q⋅T]$
   \State $rules ← \Call{AttackRules}{mvPDA}$
   \While{$\exists lhsRule, rhsRule ∈ rules :
