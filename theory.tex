@@ -191,10 +191,10 @@ An mPRS $(\Dmay, \Dmust)$ induces an MTS $(\mc P, \may[], \must[])$ as follows:
   corresponds exactly to the defending transition applicable from that state and attacking transition.
 
   For an attack tree $T = ((p,q),O,C)$, the root is given by $root(T) = (p,q)$.
-  We define the set of \emph{open states} by the states that
-  have an open edge to it, that is
+  The tree has two kinds of leaves, open and closed ones. For the set
+  of \emph{open leaves} we have
   $open(((p,q,r), O, C)) = O ∪ ⋃_{T' ∈ C} open(T')$.
-  We say that a tree is \emph{closed} if it has no open states, that is
+  We say that a tree is \emph{closed} if it has no open leaves, that is
   $closed(T)$ \iff $open(T) = ∅$.
 
   %The set of successors from the root node of a tree is given by
@@ -265,12 +265,12 @@ An mPRS $(\Dmay, \Dmust)$ induces an MTS $(\mc P, \may[], \must[])$ as follows:
         $∪ (open(T'') ∖ \{(p', q')\} ∪ open(R))$
         $= ((open(T') ∖ \{(p'',q'')\} ∪ open(T'')) ∖ \{(p', q')\}) ∪ open(R))$.
   \end{enumerate}
-  % todo
+  % TODO
   By replacing all nodes $((p'',q''), O', C')$ where
   $(p',q') ∈ O'$ with $((p'',q''), O ∖ \{(p', q')\}, C' ∪ R)$.
 \end{proof}
 
-% todo relation tree <-> refinement
+% TODO relation tree <-> refinement
 
 \begin{theorem}
   \label{theorem:refinement-tree}
@@ -416,6 +416,70 @@ mPRS $(\Dmay, \Dmust)$ such that $\Dmust$ is a vPDA.
   \end{enumerate}
 \end{proof}
 
+\begin{definition}[Tree represented by an attack rule]
+  A tree $T$ is said to be \emph{represented} by an
+  attack rule $(p,q) \attack S$ if there exist $s,t ∈ \mc P$
+  such that $root(T) = (p⋅s,q⋅t)$
+  and $open(T) = \{ (p'⋅s,q'⋅t) \mid (p',q') ∈ S \}$
+\end{definition}
+
+\begin{definition}[Partition of an attack tree]
+  A set of attack trees $P ⊆ \mc T$ is a \emph{partition} of
+  an attack tree $T$ if there is $R ∈ P$ with $root(R) = root(T)$
+  and for all $R ∈ P$:
+  \begin{enumerate} 
+    \item For every leaf $R' ∈ leafs(P)$: Either $R'$ is a leaf
+      of $T$ or $R' = R''$ for some $R'' ∈ P$.
+    %\item $R$ is a subtree of $T$. % define subtree
+    %\item With $S = \{ root(R') \mid R' ∈ P ∧ R'\text{ is descendant of }R ∧ R' ≠ R\}$
+    %  being the descendants of $R$, not including itself, then $open(R) = S$
+  \end{enumerate}
+\end{definition}
+
+\begin{lemma}
+  \label{lemma:attack-to-tree}
+  If $(p,q) \attack S$, then there is a tree
+  $T$ with $root(T) = (p,q)$ and $open(T) = S$.
+\end{lemma}
+\begin{proof}
+  By induction on the construction of $(p,q) \attack S$:
+  \begin{enumerate}
+    \item It was constructed by rule 1 from $(p, a, p') ∈ \Dmay$. Then there is
+      an attacking transition $p \may[a] p'$ and 
+      for every $(q, a, q') ∈ \Dmay$ there is an induced defending transition
+      $q \may[a] q'$.
+      Then $S = \{ (p',q') | q \may[a] q' \}$ and by attack tree inference rule 1
+      there is $T = ((p, q), S, ∅)$ with $open(T) = S$.
+    \item It was constructed by rule 2 from $(q, a, q') ∈ \Dmust$. Then there is
+      an attacking transition $q \must[a] q'$ and 
+      for every $(p, a, p') ∈ \Dmay$ there is an induced defending transition
+      $p \must[a] p'$.
+      Then $S = \{ (p',q') | p \may[a] p' \}$ and by attack tree inference rule 2
+      there is $T = ((p, q), S, ∅)$ with $open(T) = S$.
+    \item It was constructed by rule 3 from
+      $(p,q) \attack \{(p'⋅P,q'⋅Q)\} \uplus S''$ and
+      $(p',q') \attack S'$ with $S = S'' ∪ S'''$ and
+      $S''' = \{  (p''⋅P, q''⋅Q) \mid (p'',q'') ∈ S' \}$.
+      Then by induction hypothesis there is
+      a tree $T'$ with $root(T') = (p',q')$ and $open(T') = S'$ and
+      a tree $T''$ with $root(T'') = (p,q)$ and $open(T'') = S'' \uplus \{(p'⋅P,q'⋅Q)\}$.
+      By appying lemma \ref{lemma:tree-lift} on $T'$ there is a tree
+      $T'''$ with $root(T''') = (p'⋅P,q'⋅Q)$,
+      $open(T''') = O''' \uplus \{(p'⋅P,q'⋅Q)\}$ and
+      $O''' = \{ (p''⋅P, q''⋅Q) \mid (p'',q'') ∈ S' \} = S'''$.
+      By applying lemma \ref{lemma:tree-composition} on $T''$ and $T'''$ there is
+      a tree $T$ with $root(T) = (p,q)$ and $open(T) = S'' ∪ S''' = S$.
+    \item It was constructed by rule 4 from
+      $(p,q) \attack S'' \uplus \{(p',q')\} $ and
+      $(p',q') \attack S'$ with $S = S'' ∪ S'$.
+      Then by induction hypothesis there is
+      a tree $T'$ with $root(T') = (p',q')$ and $open(T') = S'$ and
+      a tree $T''$ with $root(T'') = (p,q)$ and $open(T'') = S'' \uplus \{(p',q')\}$.
+      By applying lemma \ref{lemma:tree-composition} on $T'$ and $T''$ there is
+      a tree $T$ with $root(T) = (p,q)$ with $open(T) = S'' ∪ S' = S$.
+  \end{enumerate}
+\end{proof}
+
 \begin{theorem}
   \label{theorem:tree-attack}
   For an mvPDA $(\Dmay, \Dmust)$ with its induced MTS $(\mc P, \may[], \must[])$,
@@ -427,30 +491,68 @@ mPRS $(\Dmay, \Dmust)$ such that $\Dmust$ is a vPDA.
 \begin{proof}
     \Rightarrow: Assume $T$ to be closed tree with $root(T) = (P⋅S,Q⋅T)$.
 
-      We show that for any partition of the tree $P = \{T_1, …, T_n\}$ where
-      every $T_i$ is represented by a rule $b_i$, there is
-      an attack rule representing the whole tree.
-      Proof by induction over the length of the partition $n$:
+      We show that if there is a $n$ rules $(a_1, …, a_n\}$ such that
+      there is a partition $\{R_1, …, R_n\}$ of $T$ with each $R_i$ being
+      represented by $a_i$, then there is a rule representing $T$.
+
+      We show that by induction on $n$:
+      
       \begin{enumerate}
-        \item $n = 1$: Then $T_1 = T$ and $b_1$ represents $T$.
-        \item $n > 1$: WLOG let $T_1 = (P⋅S, Q⋅T)$
-          be the part at the root of the tree $T$ with succeding partitions $C$.
+        \item $n = 1$: Then $R_1 = T$ and $a_1$ represents $T$.
+        \item $n > 1$: WLOG let $R_1$
+          be the part at the root of the tree $T$ with $root(R) = (P⋅S, Q⋅T)$
+          Let $C$ be the direct descendants of $R$.
           
-          As $n > 1$, there is $(p', q', r') ∈ C$.
-          Then for $b_1 = (P⋅S,Q⋅T) \attack S$ we have by representation
-          $(p', q') ∈ S$
-          and we have $|p'| = |q'| ≥ 2$, as otherwise the rule $r'$ would
-          not be applicable from the state $(p', q')$. So $b_1$ is a left-hand side rule.
+          As $n > 1$, there is $R' ∈ C$ with $root(R') = (p',q')$.
+          Then for $a_1 = (P⋅S,Q⋅T) \attack S$ we have by representation
+          $(p', q') ∈ S$.
+          
+          We have $|p'| = |q'| ≥ 2$, as otherwise the we would have $(p',q') = (P,Q)$
+          and there is no rule applicable from that state, therefore $R'$ would not exist.
+          So $b_1$ is a left-hand side rule.
 
-          For every partition $T_i$ with no succeding partitions, we have
-          $b_i = (p,q) \rightarrow ∅$, so that is a right-hand side rule.
+          For every part $R_i$ with no direct descendants, we have
+          $open(R_i) = ∅$ and therefore $a_i = (p,q) \rightarrow ∅$,
+          so that is a right-hand side rule.
+          Every path in $T$ eventually leads to such a part.
 
-          Then by following the successors of the partitions from $T_1$, we will eventually
-          come to a partition $T_i$ followed by a partition
-          $T_j$ such that
+          Then by following the successors of the parts from $T_1$, we will eventually
+          come to a partition $R_i$ succeded by a partition $R_j$ such that
           $b_i$ is a left-hand side rule and $b_j$ is a right-hand side rule.
           
           Then by rule 3 or 4 we can combine $b_i$ and $b_j$ into a new rule $b_0$.
+          And as $root(R_j) ∈ open(R_i)$,
+          by lemma \ref{lemma:tree-composition}
+          we get a tree $R_0$ with $root(R_0) = root(R_i)$ and
+          $open(R_0) = open(R_i) ∖ \{ root(R_j) \} ∪ open(R_j)$.
+          The partition $P' = P ∖ \{R_i, R_j\} ∪ \{R_0\}$ then is again a partition
+          of $T$. We now show that we can construct a rule representing $R_0$:
+          
+          $b_i = (p,q) \attack S \uplus \{(p'',q'')\}$
+          $b_j = (p',q') \attack S'$
+          with $∃s,t,s',t' ∈ \mc P: ∃ (p'',q'') ∈ S : (p''⋅s,q''⋅t) = (p'⋅s',q'⋅t')$.
+          As $2 ≤ |p''| = |q''| ≤ 3$ and $|p'| = |q'| = 2$ either
+          $s = s'$ and $t = t'$ or $P⋅s = s'$ and $Q⋅t = t'$ for some $P,Q ∈ Const$.
+          
+          In the first case, $(p',q') = (p'',q'')$, and we can apply rule 3 to obtain
+          $(p,q) \attack S ∪ S'$ which represents an attack tree $T_0$ with
+          $root(T_0) = (p⋅s,q⋅t)$ and $open(T_0) = \{ (p'⋅s,q'⋅t) \mid (p',q') ∈ S ∪ S' \}$.
+
+          In the second case, $(p'⋅P,q') = (p'',q'')$, and we can apply rule 3 to obtain
+          $(p,q) \attack S ∪ \{  (p''⋅P, q''⋅Q) \mid (p'',q'') ∈ S' \}$
+          which represents an attack tree $T_0$ with
+          $root(T_0) = (p⋅s,q⋅t)$ and $open(T_0) =
+          \{ (p'⋅s,q'⋅t) \mid (p',q') ∈ S \} ∪ \{ (p''⋅P⋅s,q''⋅Q⋅t) \mid (p'',q'') ∈ S' \}$.
+
+          If we used rule 4, we know
+          by representation there are $s,t,s',t' ∈ \mc P$ with $root(R_i) = (p⋅s,q⋅t)$,
+          $root(R_j) = (p'⋅s',q'⋅t')$
+          
+          If we used rule 4, we know
+          by representation there are $s,t,s',t' ∈ \mc P, P,Q ∈ Const$ with
+          $root(R_i) = (p⋅s,q⋅t)$,
+          $root(R_j) = (p'⋅P⋅s',q'⋅Q⋅t') = (p'⋅P⋅s',q'⋅Q⋅t')$
+
           This rule represents the partition $T_i$ in $P' = P ∖ \{T_j\}$. Every
           other $T_k ∈ P'$ remains unchanged and is still represented by $b_k$.
           Then by induction hypothesis there is a $b$ representing $T$.
