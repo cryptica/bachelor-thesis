@@ -2,7 +2,9 @@
 
 \section{Basic definitions}
 
- process rewrite systems \cite{Mayr00, Esparza01}. % TODO
+Processes are terms combined with parallel or sequential composition.
+
+The syntax here is taken from \cite{Mayr00} and \cite{Esparza01}.
 
 % processes are parallel or sequential
 
@@ -30,6 +32,8 @@ The class of processes that can be produced just with rule 0, 1 and P, i.e. cont
 is the class of \emph{parallel processes} \textbf{P}.
 % TODO add constant or general processes?
 
+The size of a process will be defined by the number of constants appearing in it.
+
 \begin{definition}[Size of a process]
   The size $|p|$ of a process term $p$ is defined by
   \begin{align*}
@@ -40,19 +44,11 @@ is the class of \emph{parallel processes} \textbf{P}.
   \end{align*}
 \end{definition}
 
-%\begin{definition}[Constants of a process term]
-%  The set of constants $Const(p)$ appearing in a process term $p$ is defined by
-%  \begin{align*}
-%    Const(ε) &= ∅ \\
-%    Const(X) &= \{ X \} \\
-%    Const(p⋅q) &= Const(p) ∪ Const(q) \\
-%    Const(p\|q) &= Const(p) ∪ Const(q) \\
-%  \end{align*}
-%\end{definition}
-
 \section{Modal transition system}
 
-%Modal process rewrite systems \cite{BenesK12} are a modal extension of 
+Modal process rewrite systems \cite{BenesK12} are a modal extension of 
+process rewrite system. 
+There are two types of transitions, may and must transitions.
 
 Modal transition system definition from \cite{BenesK12}:
 \begin{definition}[Modal transition system]
@@ -64,6 +60,15 @@ and an element $(p,a,q) ∈ \must[]$ is a \emph{must transition}, also written a
 \end{definition}
 
 \section{Modal refinement}
+
+Modal refinement of one process of another.
+May transitions may be present in the refinement, while must transitions must be present.
+In the other directions, only may
+A must transition always has a corresponding may transition.
+
+Out of simplicity, we regard only modal refinment for two processes from a single MTS.
+Modal refinement of processes from two different MTS can be reduced to this by taking
+the disjoint union of the MTS.
 
 \begin{definition}[Refinement]
   Let $(\mc P, \may, \must)$ be an MTS
@@ -77,48 +82,26 @@ and an element $(p,a,q) ∈ \must[]$ is a \emph{must transition}, also written a
     \item If $q \must[a] q'$ then there is a transition $p \must[a] p'$ s.t.
           $(p',q') ∈ \mc R$.
   \end{enumerate}
-\end{definition}
+  Modal refinement can also be seen as a refinement game from a pair of processes
+  $(p,q)$ where each side plays an attacking transition and the other a defending transition
+  to reach a new state.
 
-Modal refinement can also be seen as a refinement game from a pair of processes
-$(p,q)$ where each side plays an attacking transition and the other a defending transition
-to reach a new state.
-The attacker wins if there is a strategy of attacking transitions where the
-defender always ends up in state where there are no defending transitions, otherwise
-the defender wins.
-
-\begin{definition}[Refinement game]
-  Let $(\mc P, \may, \must)$ be an MTS
-  and $p,q ∈ \mc P$ be processes.
-
-  We define the set of \emph{attacking transitions}
-  $Att = \{ (p, q, p \may[a] p') \mid p \may[a] p' \} ∪
-                 \{ (p, q, q \must[a] q') \mid q \may[a] q' \}$.
+  Thus if from the state $(p,q)$ there is a transition $p \may[a] p'$ or $q \may[a] q'$,
+  we will call this an \emph{attacking transition} and a transition
+  $q \may[a] q'$ or $p \must[a] p'$ from that state matching the type and action of
+  the attacking transition a \emph{defending transition}.
   
-  For an attacking transition $r ∈ Att$, the defending
-  transitions are \\
-  we will make use of that notion
-  \[
-  Def((p, q, r)) = \begin{cases}
-    \{ (q \may[a] q', p', q') \mid q \may[a] q' \} & \text{if }r = p \may[a] p' \\
-    \{ (p \must[a] p', p', q') \mid p \must[a] p' \} & \text{if }r = q \must[a] q'
-  \end{cases}
-  \]
-  Then if $(p,q,r) ∈ Att$ and $(p',q') ∈ Def((p,q,r))$ we would
-  get an attack transition $(p,q) \attack[r,r'] (p',q')$.
-  % TODO rewrite
-
-  With that we can say that $p ≤_m q$ if there is a relation
-  $\mc R ⊆ \mc P × \mc P $ such that
-  $(p, q) ∈ \mc R$ and for every $(p,q,r) ∈ Att$ if $(p, q) ∈ \mc R$ then there
-  is $(p',q') ∈ Def((p,q,r))$ such that $(p',q') ∈ \mc R$.
+  Then $p ≤_m q$ holds if there no winning strategy from $(p,q)$, i.e.
+  a sequence of attacking transitions such that for every choice of defending transition
+  we will reach a state $(p',q')$ from which there is an attacking transition but no
+  defending transition.
 \end{definition}
-% modal refinement of two MTS
 
 \section{Modal process rewrite system}
 
 \begin{definition}[Modal process rewrite system]
 A \emph{process rewrite system (PRS)} over an action alphabet $Act$
-is a finite relation $Δ ⊆ \mc P ∖ \{ε\} × Act × \mc P$
+is a finite relation $Δ ⊆ \mc P ∖ \{ε\} × Act × \mc P$.
 Elements of $Δ$ are called \emph{rewrite rules}.
 A \emph{modal process rewrite system (mPRS)} is a tuple $(\Dmay, \Dmust)$ where
 $\Dmay, \Dmust$ are process rewrite systems such that $\Dmay ⊆ \Dmust$.
@@ -140,21 +123,18 @@ An mPRS $(\Dmay, \Dmust)$ induces an MTS $(\mc P, \may[], \must[])$ as follows:
 
   An \emph{attack tree} over a set of processes $\mc P$ is a rooted tree where
   each node has two kinds of children.
-  It is given by a triple $(s,O,C)$,
-  representing the tree with the root node labeled by $s ∈ \mc P^2$,
-  the set of open edges $O$ leading to states $s' ∈ \mc P^2$ and
+  It is given by a triple $((p,q),O,C)$,
+  representing the tree with the root node labeled by $(p,q) ∈ \mc P^2$,
+  the set of open edges $O$ leading to states $(p',q') ∈ \mc P^2$ and
   the set of closed edges $C$ leading to the attack trees that are children of the
   root node.
   
-%  labeled with the attack transition $s ∈ Att$,
-%  and each edge labeled with a defending transition leads to a child tree
-%m  or an element $\{(p',q')\}$
-%  $O ⊆ Def(s)$ is a set of open edges labeled
-%  and $C ⊆ Def(s) × \mc T$ is the set of closed edges labeled with a defending
-%  transition and leading to a child tree in $\mc T$, the set of all trees.
-
+  For an attack tree $T = ((p,q),O,C)$, we will use the short notations
+  $T_r = (p,q)$ for the root, $T_O = O$ for the set of states open edges lead to
+  and $T_C = C$ for the set of subtrees closed edges lead to.
+  
   The set of attack trees $\mc T$ constructable from an MTS $(\mc P, \may, \must)$
-  are defined inductively by
+  are defined inductively by:
   \begin{mathpar}
     \inferrule{p,q ∈ \mc P, p \may[a] p'}
       {((p,q), \{ (p', q') \mid q \may[a] q' \}, ∅) ∈ \mc T}
@@ -162,182 +142,136 @@ An mPRS $(\Dmay, \Dmust)$ induces an MTS $(\mc P, \may[], \must[])$ as follows:
     \inferrule{p,q ∈ \mc P, q \must[a] q'}
       {((p,q), \{ (p', q') \mid p \must[a] q' \}, ∅) ∈ \mc T}
     \, (2) \\
-    \inferrule{((p,q), O \uplus (p', q'), C) ∈ \mc T \\ T = ((p', q'), O', C') ∈ \mc T}
-      {(s, O, C ∪ \{T\}) ∈ \mc T}
+    %\inferrule{((p,q), O \uplus (p', q'), C) ∈ \mc T \\ T = ((p', q'), O', C') ∈ \mc T}
+    %  {(s, O, C ∪ \{T\}) ∈ \mc T}
+    %\, (3) \\
+    \inferrule{T ∈ \mc T \\ R ∈ \mc T \\ R_r ∈ T_O}
+      {(T_r, T_O ∖ \{R_r\}, T_C ∪ \{R\}) ∈ \mc T}
     \, (3) \\
   \end{mathpar}
-%  An \emph{attack tree} is given by its node $(p, q, r) ∈ $,
-%  a set of open edges $O ⊆ \mc P^2 × (\may ∪ \must)$ and set
-%  of closed edges to children $C ⊆ \mc (P^2 × (\may ∪ \must)) × \mathcal T$ where
-%  $\mc T$ is the set of trees. They are defined inductively by
   
   Rules 1 and 2 specify an initial tree for an attacking rule with the possible defensive
   states while rule 3 replaces an open edge to a state with a tree with that state as its
   root.
-  As we can see from the construction rules, every node $(p,q)$ in the tree corresponds
-  to an attacking transition applicable from that state, while the set of edges from that node
-  corresponds exactly to the defending transition applicable from that state and attacking transition.
 
-  For an attack tree $T = ((p,q),O,C)$, the root is given by $root(T) = (p,q)$,
-  the open edges by $openedge(T) = O$ and closed edges by $closededge(T) = C$. % TODO better names
+  As we can see from the construction rules, every tree
+  has a corresponding attacking transition from the root node, while for each defending transition
+  applicable from that state and attacking transition there is an edge to either an open state or
+  a subtree. Therefore we can identify nodes with attacking transitions and edges with
+  defending transitions.
 
-  The \emph{subtrees} of $T$ are given recursively by
-  $subtree(T) = T ∪ ⋃_{T' ∈ closededge(T)} subtree(T')$.
+  The sot of all \emph{subtrees} of $T$, including $T$ itself, are given recursively by
+  $subtree(T) = T ∪ ⋃_{T' ∈ T_C} subtree(T')$.
   
-  The set of \emph{open states} of $T$ are the states that
-  have an open edge to it, that is
-  $open(T) = ⋃_{T' ∈ subtree(T)} openedge(T')$.
+  The set of all \emph{open states} of $T$ are the states that
+  have an open edge to it, that is $open(T) = ⋃_{T' ∈ subtree(T)} T'_O$.
   
   We say that a tree is \emph{closed} if it has no open states, that is
   $closed(T)$ \iff $open(T) = ∅$.
 
-  %The set of successors from the root node of a tree is given by
-  %$succ((p,q), O, C) = O ∪ \{(p',q') \mid ((p',q'), O', C') ∈ C$.
-
-  %For a closed attack tree, we can define
-  %a) a node $c$ is a child of $r$ if there is a non-empty path from $r$ to $c$.
-  
-  %A partition $P$ of a tree is given by a set of nodes $P = \{T_1, …, T_n\}$.
-  %The part represented by $T_i ∈ P$ is the node $T_i$ and all nodes that are successors
-  %of $T_i$ but not of another $T_j ∈ P$.
-
-  %$(p,q) \attack S$ is said to represent a partition $T$ if
-  %$∃ s,t ∈ \mc P$ such that $(p⋅s,q⋅t) = T$ and
-  %with $C = \{ T' ∈ P \mid T \attack T' \}$ $\{(p⋅s,q⋅t) | (p,q) ∈ S \} = C$.
-
-  %b) a subtree
-  %as a tupel $(r,C)$ where $r$ is a node in the tree and $C$ is a set of
-  %nodes such that each $c ∈ C$ is a child of $r$ but no child of another $c ∈ C$.
-  %The subtree is then the tree given by $r$ and the paths from $r$ to each $c ∈ C$.
-  %The set $C$ may be empty, in which case the subtree is just the node $r$.
 \end{definition}
 
-\begin{lemma}
+\begin{lemma}[Tree composition]
   \label{lemma:tree-composition}
   If there are attack trees $T$ and $R$ with
-  $root(R) ∈ open(T)$,
+  $R_r ∈ open(T)$,
   then there is an attack tree $S$ with
-  $root(S) = root(T)$ and
-  $open(S) = open(T) ∖ \{root(R)\} ∪ open(R)$
+  $S_r = T_r$ and
+  $open(S) = open(T) ∖ \{R_r\} ∪ open(R)$.
+  and $s ∈ T_O$
 \end{lemma}
 \begin{proof}
   For every subtree $T' ∈ subtree(T)$
-  with $(p',q') ∈ openedge(T')$, we can construct
-  $S' = ((p'',q''), openedge(T') ∖ \{(p',q')\}, closededge(T') ∪ open(R)$ with
-  $open(S') = openedge(T) ∖ \{(p',q')\} ∪ open(R)$.
+  with $R_r ∈ T'_O$, we can construct
+  $S' = (T'_r, T'_O ∖ \{R_r\}, T'_C ∪ \{R\}$ with
+  $open(S') = T'_O ∖ \{R_r\} ∪ open(R)$.
   Th tree $S'$ can be added as a subtree whenever $T'$ could be,
   be used in the construction rules as $T$.
-  $open(S) = ⋃_{S' ∈ subtree(S)} openedge(S')$
-  $open(S) = ⋃_{T' ∈ subtree(T)} openedge(T') ∖ \{(p',q')\} ∪ open(R)$.
-  $= (⋃_{T' ∈ subtree(T)} openedge(T')) ∖ \{(p',q')\} ∪ open(R)$.
-  $= open(T) ∖ \{(p',q')\} ∪ open(R)$.
+  $open(S) = (⋃_{T' ∈ subtree(T) \| R_r ∈ T'_O} S'_O)$
+  $ ∪ (⋃_{T' ∈ subtree(T) \| R_r ∉ T'_O} T'_O)$
+  $= (⋃_{T' ∈ subtree(T) \| R_r ∈ T'_O} T'_O ∖ \{R_r\} ∪ open(R)$.
+  $ ∪ (⋃_{T' ∈ subtree(T) \| R_r ∉ T'_O} T'_O ∖ \{R_r\})$
+  $= (⋃_{T' ∈ subtree(T)} T'_O) ∖ \{R_r\} ∪ open(R)$.
+  $= open(T) \{R_r\} ∪ open(R)$.
 \end{proof}
 \begin{proof}
-  We prove the proposition by induction on the number of subtrees
-  with an open edge to $(p',q')$, that is
-  $n = |\{T' ∈ subtree(T) \mid (p',q') ∈ open(T') \}|$:
+  We prove the proposition by induction on the number of child trees
+  with an open edge to $R_r$, that is
+  $n = |\{ T' ∈ T_C \mid R_r ∈ open(T')\}|$:
   \begin{enumerate}
     \item $n = 0$:
-      Then
-      $root(R) ∈ openedge(T)$ and $root(T) ∉ open(T')$ for $T' ∈ closededge(T)$
+      Then $R_r ∈ T_O$ and $T_r ∉ open(T')$ for $T' ∈ T_C$
       and we can construct
-      $S = ((p,q), openedge(T) ∖ \{root(R)\}, closededge(T) ∪ \{R\})$ with
-      $open(S) = open(T) ∖ \{root(R)\} ∪ open(R)$
+      $S = ((p,q), T_O ∖ \{R_r\}, T_C ∪ \{R\})$ with
+      $open(S) = open(T) ∖ \{R_r\} ∪ open(R)$
     \item $n ≥ 1$:
-      
-      Then there is $T' ∈ closededge(T)$ such that $root(R) ∈ open(T')$.
+      Then there is $T' ∈ T_C$ such that $R_r ∈ open(T')$.
       By induction hypothesis there is
-      $S'$ with $root(S') = root(T')$ and
-      $open(S') = open(T') ∖ \{root(R)\} ∪ open(R)$
-      
-      and a $T''$ with $root(T') ∈ openedge(T'')$ and
-      $closededge(T'') = closededge(T) ∖ \{T'\}$.
+      $S'$ with $S'_r = T'_r$ and
+      $open(S') = open(T') ∖ \{R_r\} ∪ open(R)$
 
-      Then we can construct
-      $S = (root(T), openedge(T) ∖ root(T'), closededge(T) ∖ \{T'\} ∪ \{S'\}$
-      with
-      $open(S) = open(T) ∖ \{root(R)\} ∪ open(R) ∪ open(S)$
+      As $T'$ was added to $T_C$ some point in the construction of $T$,
+      we can substitute $T'$ with $S'$ and obtain
+      $T''$ with $T''_r = T_r$, $T''_O = T_O$ and
+      $T''_C = T_C ∖ \{T'\} ∪ \{S'\}$.
+      We have $open(T'') = T_O ∪ (⋃_{R' ∈ T_C ∖ \{T'\} } open(R')) ∪ open(S')$.
 
-      with $(p',q') ∈ open(T)$ and we can construct
-    \item $T = ((p,q), O, ∅)$:
-      Then $(p',q') ∈ O$ and we can construct
-      $S = ((p,q), O ∖ \{(p',q')\}, \{R\}$ with
-      $open(S) = open(T) ∖ \{(p', q')\} ∪ open(R)$
-    \item $T = ((p,q), O, C ∪ T'')$ from
-        $T' = ((p,q), O \uplus \{(p'',q'')\}, C)$ and
-        $T'' = (p'',q''), O'', C'')$.
-        $open(T) = open(T') ∖ \{(p'',q'')\} ∪ open(T'')$
-
-        If $(p',q') ∈ open(T')$, by induction hypothesis we get
-        $S' = ((p,q), (O \uplus \{(p'',q'')\}) ∖ \{(p', q'\}, C')$ with
-        $open(S') = open(T') ∖ \{(p', q')\} ∪ open(R)$.
-        %$open(S') = ((open(T') ∖ \{(p', q')\}) \uplus \{(p'',q'')\}, C')$.
-        %else set $S' = T'$.
-        
-        If $(p',q') ∈ open(T'')$, by induction hypothesis we get
-        $S''$ with $root(S'') = (p'',q'')$ and
-        $open(S'') = open(T'') ∖ \{(p', q')\} ∪ open(R)$.
-        else set $S'' = T''$.
-        
-        As $(p',q') ∈ open(T)$, if $(p',q') ∈ O$, then $(p',q') ≠ (p'',q'')$. Therefore
-        $S' = ((p,q), (O ∖ \{(p', q')\}) \uplus, C')$.
-        Then from $S'$ and $S''$ construct
-        $S = ((p,q), O ∖ \{(p'',q'')\} ∖ \{(p', q'\} , C ∪ S'')$ with
-        $open(S) = open(S') ∖ \{(p'', q'')\} ∪ open(S'')$.
-        $= (open(T') ∖ \{(p', q')\} ∖ \{(p'',q'')\}  ∪ open(R))$
-        $∪ (open(T'') ∖ \{(p', q')\} ∪ open(R))$
-        $= ((open(T') ∖ \{(p'',q'')\} ∪ open(T'')) ∖ \{(p', q')\}) ∪ open(R))$.
+      If $R_r ≠ open(T'')$, then $open(T'') = open(T) ∖ \{R_r\} ∪ open(R)$ and we are done.
+      Otherwise $T''$ has less children with an open edge to
+      $R_r$, therefore we
+      can apply the induction hypothesis on it and obtain
+      $S$ with $S_r = T_r$ and
+      $open(S) = open(T'') ∖ \{R_r\} ∪ open(R) = open(T) ∖ \{R_r\} ∪ open(R)$.
   \end{enumerate}
-  % TODO
-  By replacing all nodes $((p'',q''), O', C')$ where
-  $(p',q') ∈ O'$ with $((p'',q''), O ∖ \{(p', q')\}, C' ∪ R)$.
 \end{proof}
 
 % TODO relation tree <-> refinement
 
-\begin{theorem}
+\begin{theorem}[Attack tree refinement]
   \label{theorem:refinement-tree}
   For an MTS $(\mc P, \may, \must)$ and processes $p,q ∈ \mc P$:
   \[
-    (p ≤_m q) \iff ¬∃ T ∈ \mc T : root(T) = (p,q) ∧ closed(T)
+    (p ≤_m q) \iff ¬∃ T ∈ \mc T : T_r = (p,q) ∧ closed(T)
   \]
 \end{theorem}
 
 \begin{proof}
     \Rightarrow: Assume $p ≤_m q$. Then there is a refinement relation $\mc R$.
       To show that for $(p,q) ∈ \mc R$ there is no closed tree from $(p,q)$, we
-      show for any $T$ with $root(T) = (p, q)$, if $T$ is closed, then $(p, q) ∉ R$.
+      show the contraposition for any $T$, that is if $T$ is closed, then $T_r ∉ R$.
      
-      Let $r$ be the attacking transition corresponding to $(p,q)$ in $T$.
-      For every fitting defending transition $r'$ to $(p',q')$ there is an edge
-      from $(p,q)$ to $(p',q')$.
-      As $T$ is closed, we get $openedge(T) = ∅$
-      and every $T' ∈ closededge(T)$ is also closed.
+      Recall that for any $T$ there is an attacking transition from $T_r$ and
+      the edges correspond to the fitting defending transition.
+%      For every Let $r$ be the attacking transition corresponding to $(p,q)$ in $T$.
+%      For every fitting defending transition $r'$ to $(p',q')$ there is an edge
+%      from $(p,q)$ to $(p',q')$.
+      Further if $T$ is closed, we have $T_O = ∅$ and every $T' ∈ T_C$ is also closed.
 
       Now we show the proposition by induction over the number of subtrees
-      $n = |subtrees(T)|$:
+      $|subtrees(T)|$:
       \begin{enumerate}
-        \item $n = 0$: Then $closededge(T) = ∅$ and there is an attacking transition, but no
-          defending transition, therefore $(p,q) ∉ \mc R$.
-        \item $n ≥ 1$:
-          Then there is an attacking rule, and for every defending transition leading
-          to $(p',q')$, there is an edge to a closed tree $T'$ with $root(T') = (p',q')$.
-          $T'$ is a proper subtree of $T$ and has less subtrees, so
+        \item $|subtrees(T)| = 0$: Then there is an attacking transition and as
+          $T_C = ∅$ there is no defending transition, therefore $(p,q) ∉ \mc R$.
+        \item $|subtrees(T)| ≥ 1$:
+          Then there is an attacking rule and for every defending transition leading
+          to $(p',q')$, there is an edge to a closed tree $T'$ with $T'_r = (p',q')$.
+          $T'$ is a proper subtree of $T$ and has less subtrees itself, so
           by induction hypothesis we have $(p',q') ∉ \mc R$ and therefore $(p,q) ∉ \mc R$.
       \end{enumerate}
-    \Leftarrow: Assume there is no closed attack tree $T$ with $root(T) = (p,q)$.
-      To show $p ≤_m q$, we show that $\mc R := \{ (p',q') \mid ¬∃ T : root(T) = (p',q') ∧ closed(T) \}$ is a valid
+    \Leftarrow: Assume that there is no closed attack tree $T$ with $T_r = (p,q)$.
+      To show $p ≤_m q$, we show that
+      $\mc R := \{ (p',q') \mid ¬∃ T : T_r = (p',q') ∧ closed(T) \}$ is a valid
       refinement relation with $(p,q) ∈ \mc R$.
 
-      For any attacking transition $r$ and $(p,q) ∈ \mc R$,
+      For any attacking transition and $(p,q) ∈ \mc R$,
       by inference rule 1 or 2 there exists an attacking tree $T$ with
-      $root(T) = (p,q)$.
-      From all such $T$ with $root(T) = (p,q)$, choose one where $openedge(T)$ is minimal
+      $T_r = (p,q)$.
+      From all such $T$ with $T_r = (p,q)$, choose one where $T_O$ is minimal
       with regard to the inclusion order.
-      There exists $(p',q') ∈ openedge(T)$ with $(p',q') ∈ \mc R$, because otherwise
-      there would be a closed attack tree $T'$ with $root(T') = (p',q')$ and
+      There exists $(p',q') ∈ T_O$ with $(p',q') ∈ \mc R$, because otherwise
+      there would be a closed attack tree $T'$ with $T'_r = (p',q')$ and
       by inference rule 3 we would get
-      $T'' = (root(T), openedge(T'') ∖ \{p',q'\}, closededge(T) ∪ \{T'\})$ with $openedge(T'') = openedge(T) ∖ \{(p',q')\} ⊊ openedge(T)$
+      $T'' = (T_r, T_O ∖ \{p',q'\}, T_C ∪ \{T'\})$ with $T''_O = T_O ∖ \{(p',q')\} ⊊ T_O$
       in contradiction to the minimality of $O$.
       So for the attacking transition from $(p,q)$ there is a defending transition
       to $(p',q')$ with $(p',q') ∈ \mc R$.
@@ -354,7 +288,7 @@ A PRS $Δ$ over the action alphabet $Act$ is a
 \emph{visibly pushdown automaton (vPDA)} if
 there is a partition
 $Act = Act_r \uplus Act_i \uplus Act_c$
-such that every rule $(p, a, p') ∈ Δ$ has the form
+such that every rule $(p, a, p') ∈ Δ$ has the form:
 \begin{align*}
   p &= P⋅S
   & &\text{and} &
@@ -365,13 +299,18 @@ such that every rule $(p, a, p') ∈ Δ$ has the form
 \end{cases}
 \end{align*}
 A \emph{modal visibly pushdown automaton (mvPDA)} is then an
-mPRS $(\Dmay, \Dmust)$ such that $\Dmust$ is a vPDA.
+mPRS $(\Dmay, \Dmust)$ such that $\Dmay$ and $\Dmust$ are vPDA.
 \end{definition}
 
+For mvPDA we will define a relation similiar which allows us to represent
+a parts of the attack tree for the corresponding MTS. These are attack rules.
+
 \begin{definition}[Attack rule]
-  Let $(\Dmay, \Dmust)$ be an mvPDA.
-  An \emph{attack rule} $(p,q) \attack S$ with $p,q ∈ \mc P$ and $S ⊆ \mc P$
-  is obtainable from the rewrite rules if it can be constructed by the following rules:
+  An \emph{attack rule} is a tuple $((p,q), S)$ with $p,q ∈ \mc P$ and $S ⊆ \mc P$.
+  It is written as $(p,q) \attack S$
+  
+  For an mvPDA $(\Dmay, \Dmust)$, the attack rules
+  obtainable from the rewrite rules are given by:
   \begin{mathpar}
     \inferrule{(p, a, p') ∈ \Dmay}{(p,q) \attack \{ (p', q') \mid (q, a, q') ∈ \Dmay \}}
       \, (1) \\
@@ -379,18 +318,18 @@ mPRS $(\Dmay, \Dmust)$ such that $\Dmust$ is a vPDA.
       \, (2) \\
     \inferrule{(p,q) \attack \{(p',q')\} \uplus S \\ (p',q') \attack S' \\
       ∀(p'',q'') ∈ S' : |p''| = 1 }
-      { (p,q) \attack S ∪ S'} \, (3)
+      { (p,q) \attack S ∪ S'} \, (3) \\
     \inferrule{(p,q) \attack \{(p'⋅P,q'⋅Q)\} \uplus S \\ (p',q') \attack S' \\
       ∀(p'',q'') ∈ S' : |p''| = 1 }
-      {(p,q) \attack S ∪ \{  (p''⋅P, q''⋅Q) \mid (p'',q'') ∈ S' \}} \, (4) \\
+      {(p,q) \attack S ∪ \{  (p''⋅P, q''⋅Q) \mid (p'',q'') ∈ S' \}} \, (4)
   \end{mathpar}
 
-  Due to the constrainst on the rewrite rules of an mvPDA and the construction of the
-  attack rules, we can see that for any element $(p,q) \attack S$ it holds that
+  Due to the constraints on the rewrite rules of an mvPDA and the construction of the
+  attack rules, we can see that for any rule $(p,q) \attack S$, it holds that
   $|p| = |q| = 2$ and for any $(p',q') ∈ S$ that $1 ≤ |p'| = |q'| ≤ 3$.
   
   When the rules 3 and 4 always combine a rule $(p,q) \attack S \uplus \{(p',q')\}$
-  on the left and rule $(p',q') \attack S'$ on right, it always holds that
+  and a rule $(p',q') \attack S'$ on right, it always holds that
   $|p'| = 2$ or $|p'|$ = 3 and for all $(p'',q'') ∈ S'$ $|p''| = 1$.
   We will call a rule $p \attack S$ a \emph{right-hand side} rule if
   $∀(p',q') ∈ S: |p'| = 1$ and otherwise a \emph{left-hand side} rule.
@@ -398,60 +337,36 @@ mPRS $(\Dmay, \Dmust)$ such that $\Dmust$ is a vPDA.
 \end{definition}
 
 \begin{lemma}
-  \label{lemma:tree-unlift}
+  \label{lemma:rule-lift}
   Given an MTS generated by a mvPDA,
-  if there is an
-  attack tree $T$ with $root(T) = (p⋅s,q⋅t)$,
-  $|p| = |q| = 2$ and $s,t ∈ \mc P$,
-  then there is an
-  attack tree $R$ with $root(R) = (p, q)$ and
-  $open(R) = \{ (p'⋅s,q'⋅t) \mid (p', q') ∈ open(T) \}$.
-\end{lemma}
-
-\begin{lemma}
-  \label{lemma:tree-lift}
-  Given an MTS generated by a mvPDA,
-  if there is an
-  attack tree $T$ with $root(T) = (p,q)$,
-  then for any $s,t ∈ \mc P$, there is an
-  attack tree $R$ with $root(R) = (p⋅s, q⋅t)$ and
-  $open(R) = \{ (p'⋅s,q'⋅t) \mid (p', q') ∈ open(T) \}$.
+  for $|p| ≥ 2$, $|q| ≥ 2$, $p,q$ sequential and any $s,t ∈ \mc P$:
+\begin{align*}
+  p \may[a] p' &\iff p⋅s \may[a] p'⋅s
+  & &\text{and} &
+  q \must[a] q' &\iff q⋅t \may[a] q'⋅t
+\end{align*}
 \end{lemma}
 \begin{proof}
-  As $p$ and $q$ are the left-hand side of some rewrite rule,
-  we have $|p| ≥ 2$ and $|q| ≥ 2$.
-  Then by looking at the induction rules for an MTS from an mPRS, we have that
-  if $p \may[a] p'$, then $p⋅s \may[a] p'⋅s$ and
-  if $p⋅s \may[a] p'⋅s$, then $p \may[a] p'$, therefore
-  $\{ p⋅s \may[a] p'⋅s \mid p \may[a] p' \} = \{ p⋅s \may[a] p'⋅s \}$.
-  The same holds for $\must$.
+  \Rightarrow: Follows directly from the induction rules of an MTS from an mPRS.
   
-  We then prove the proposition by induction on $T$:
-  \begin{enumerate}
-    \item $T = ((p,q), O, ∅)$ from $p \may[a] p'$ with
-      $O = \{ (p', q') \mid q \may[a] q'\}$.
-      Then also $p⋅s \may[a] p⋅s'$ and with
-      $O' = \{ (p'⋅s, q'⋅t \mid  q⋅t \may[a] q'⋅t \}$
-      $ = \{ (p'⋅s, q'⋅t \mid  q \may[a] q' \}$
-      $ = \{ (p'⋅s, q'⋅t \mid  (p',q') ∈ O \}$
-      we can construct $R = ((p'⋅s,q'⋅t), O', ∅)$.
-    \item $T = ((p,q), O, ∅)$ from $q \must[a] q'$.
-      This case is symmetric to the first one.
-    \item $T = ((p,q), O, C ∪ T'')$ from
-        $T' = ((p,q), O \uplus \{(p',q')\}, C)$ and
-        $T'' = (p',q'), O', C')$.
-        By induction hypothesis we get
-        $R' = ((p⋅s,q⋅t), O' \uplus \{(p'⋅s,q'⋅t)\}, C')$ and
-        $R'' = (p'⋅s,q'⋅t), O'', C')$.
-        Then we can construct
-        $R = ((p⋅s, q⋅t), O, C' ∪ R'')$ with
-        $open(R) = open(R') ∖ \{(p'⋅s,q⋅t)\} ∪ open(R'')$
-        $= \{ (p'⋅s, q'⋅t) \mid (p',q') ∈ open(T') \} ∖ \{(p'⋅s,q'⋅t)\}$
-        $∪ \{ (p''⋅s, q''⋅t) \mid (p'',q'') ∈ open(T'') \}$
-        $= \{ (p''⋅s, q''⋅t) \mid (p'',q'') ∈ open(T') ∖ \{p',q'\} ∪ open(T'') \}$
-        $= \{ (p''⋅s, q''⋅t) \mid (p'',q'') ∈ open(T) \}$
-  \end{enumerate}
+  \Leftarrow: In the inference chain for $p⋅s \may[a] p'⋅s$,
+  there is a $(r,a,r') ∈ \Dmay$ which was used to obtain that rule
+  with $p⋅s = r⋅s'$ and $p'⋅s = r'⋅s'$. As $|r| ≤ |p|$, $|r'| ≤ |p'$ and $p,p',r,r'$ are all
+  sequential, there is $s''$ with $p = r⋅s''$ and $p' = r⋅s''$.
+  Then we can infer the transition $r⋅s'' \may[a] r'⋅s'' = p \may[a] p'$.
+  As $|r| ≤ |p⋅s|$ and both $p$ and $r$ are sequential, we have $r = p$
+  The same holds for $q⋅t \must q'⋅t$.
 \end{proof}
+
+\begin{corollary}
+  \label{corollary:tree-lift}
+  Given an MTS generated by a mvPDA,
+  for $|p| ≥ 2$, $|q| ≥ 2$, $p,q$ sequential and any $s,t ∈ \mc P$:
+
+  There is an attack tree $T$ with $T_r = (p,q)$
+  exactly if there is an $R$ with $R_r = (p⋅s, q⋅t)$ and
+  $open(R) = \{ (p'⋅s,q'⋅t) \mid (p', q') ∈ open(T) \}$.
+\end{corollary}
 
 \begin{definition}[Partition of an attack tree]
   A partition $P$ of an attack tree $T$ is given by a set
@@ -465,10 +380,10 @@ mPRS $(\Dmay, \Dmust)$ such that $\Dmust$ is a vPDA.
   %As the subtree relation defines a partial ordering, TODO
 
 %  A set of attack trees $P ⊆ \mc T$ is a \emph{partition} of
-%  an attack tree $T$ if there is $R ∈ P$ with $root(R) = root(T)$
+%  an attack tree $T$ if there is $R ∈ P$ with $R_r = T_r$
 %  and for all $R ∈ P$:
 %  \begin{enumerate} 
-%    \item Either $root(R) = root(T)$, or $root(R) ∈ open(R')$ for
+%    \item Either $R_r = T_r$, or $R_r ∈ open(R')$ for
 %      some $R' ∈ P$.
 %    \item For every open state $R' ∈ open(P)$: Either $R' ∈ open(T)$ or
 %      $R' = R''$ for some $R'' ∈ P$.
@@ -479,8 +394,8 @@ mPRS $(\Dmay, \Dmust)$ such that $\Dmust$ is a vPDA.
   A subtree $R ∈ P$ in a partition
   is said to be \emph{represented} by an
   attack rule $(p,q) \attack S$ if there exist $s,t ∈ \mc P$
-  such that $root(T) = (p⋅s,q⋅t)$
-  and $\{ root(R') \mid R' ∈ succ_P(R) \} = \{ (p'⋅s,q'⋅t) \mid (p',q') ∈ S \}$
+  such that $T_r = (p⋅s,q⋅t)$
+  and $\{ R'_r \mid R' ∈ succ_P(R) \} = \{ (p'⋅s,q'⋅t) \mid (p',q') ∈ S \}$
 \end{definition}
 
 \begin{theorem}
@@ -488,11 +403,11 @@ mPRS $(\Dmay, \Dmust)$ such that $\Dmust$ is a vPDA.
   For an mvPDA $(\Dmay, \Dmust)$ with its induced MTS $(\mc P, \may[], \must[])$,
   it holds that for any $P,S,Q,R ∈ Const$:
   \[
-    ∃ T : root(T) = (P⋅S,Q⋅R) ∧ closed(T) \iff (P⋅S,Q⋅T) \attack ∅
+    ∃ T : T_r = (P⋅S,Q⋅R) ∧ closed(T) \iff (P⋅S,Q⋅T) \attack ∅
   \]
 \end{theorem}
 \begin{proof}
-    \Rightarrow: Assume $T$ to be closed tree with $root(T) = (P⋅S,Q⋅T)$.
+    \Rightarrow: Assume $T$ to be closed tree with $T_r = (P⋅S,Q⋅T)$.
 
       We show that if there is a $n$ rules $\{a_1, …, a_n\}$ such that
       there is a partition $\{R_1, …, R_n\}$ of $T$ with each $R_i$ being
@@ -503,11 +418,11 @@ mPRS $(\Dmay, \Dmust)$ such that $\Dmust$ is a vPDA.
       \begin{enumerate}
         \item $n = 1$: Then $R_1 = T$ and $a_1$ represents $T$.
         \item $n > 1$:
-          Let $R_1$ be the subtree with $root(R) = (P⋅S, Q⋅T)$
+          Let $R_1$ be the subtree with $R_r = (P⋅S, Q⋅T)$
           
-          As $n > 1$, there is $R' ∈ succ_P(R)$ with $root(R') = (p',q')$.
+          As $n > 1$, there is $R' ∈ succ_P(R)$ with $R'_r = (p',q')$.
           Then for $a_1 = (P⋅S,Q⋅T) \attack S$ we have by representation
-          $root(R') ∈ S$.
+          $R'_r ∈ S$.
           
           We have $|p'| = |q'| ≥ 2$, as otherwise
           there would be no rule applicable from that state and therefore $R'$ would not exist.
@@ -518,24 +433,24 @@ mPRS $(\Dmay, \Dmust)$ such that $\Dmust$ is a vPDA.
           Every path in $T$ eventually leads to such a subtree.
 
           Then by following the successors of the subtrees from $R_1$, we will eventually
-          come to a subtree $R_i$ succeded by a subtree $R_j$ such that
+          come to a subtree $R$ succeded by a subtree $S$ such that
           $b_i$ is a left-hand side rule and $b_j$ is a right-hand side rule.
 
-          %As $R_j ∈ succ_P(R_i)$,
+          %As $S ∈ succ_P(R)$,
           %by lemma \ref{lemma:tree-composition}
-          %we get a tree $R_0$ with $root(R_0) = root(R_i)$ and
-          %$open(R_0) = open(R_i) ∖ \{ root(R_j) \} ∪ open(R_j)$.
-          The partition $P' = P ∖ \{R_j\}$ then is again a partition of $T$
-          where $succ_{P'}(R_i) = succ_P(R_i) ∖ \{R_j\} ∪ succ_P(R_j)$ and
+          %we get a tree $R_0$ with $root(R_0) = root(R)$ and
+          %$open(R_0) = open(R) ∖ \{ root(S) \} ∪ open(S)$.
+          The partition $P' = P ∖ \{S\}$ then is again a partition of $T$
+          where $succ_{P'}(R) = succ_P(R) ∖ \{S\} ∪ succ_P(S)$ and
           other successors are unchanged.
           We now show that we can construct a rule representing $R_0$:
 
           Let $b_i = (p,q) \attack S$ and $b_j = (p',q') \attack S'$.
-          By the representation of $b_i$ for $R_i$ and
-          $root(R_j) ∈ \{ root(R') \| R' ∈ succ_P(R_i) \}$,
-          there is $s,t ∈ \mc P$ and $(p'',q'') ∈ S$ with $root(R_j) = (p''⋅s,q''⋅t)$.
-          By the representation of $b_j$ for $R_j$,
-          there is $s',t' ∈ \mc P$ with $root(R_j) = (p'⋅s',q'⋅t')$.
+          By the representation of $b_i$ for $R$ and
+          $S_r ∈ \{ R'_r \| R' ∈ succ_P(R) \}$,
+          there is $s,t ∈ \mc P$ and $(p'',q'') ∈ S$ with $S_r = (p''⋅s,q''⋅t)$.
+          By the representation of $b_j$ for $S$,
+          there is $s',t' ∈ \mc P$ with $S_r = (p'⋅s',q'⋅t')$.
 
           Then $(p''⋅s,q''⋅t) = (p'⋅s',q'⋅t')$.
           As $2 ≤ |p''| = |q''| ≤ 3$ and $|p'| = |q'| = 2$ either
@@ -543,14 +458,14 @@ mPRS $(\Dmay, \Dmust)$ such that $\Dmust$ is a vPDA.
           
           In the first case, $(p',q') = (p'',q'')$, and we can apply rule 3 to obtain
           $(p,q) \attack S \{(p'',q'')\} ∪ S'$.
-          With $\{ (p'⋅s,q'⋅t) \mid (p',q') ∈ S ∖ \{(p'',q'')\} ∪ S' \} = succ_{P'}(R_i)$,
-          it represents $R_i$ in $P'$.
+          With $\{ (p'⋅s,q'⋅t) \mid (p',q') ∈ S ∖ \{(p'',q'')\} ∪ S' \} = succ_{P'}(R)$,
+          it represents $R$ in $P'$.
 
           In the second case, $(p'⋅P,q') = (p'',q'')$, and we can apply rule 4 to obtain
           $(p,q) \attack S ∪ \{  (p''⋅P, q''⋅Q) \mid (p'',q'') ∈ S' \}$
           With $\{ (p'⋅s,q'⋅t) \mid (p',q') ∈ S ∖ \{(p'',q'')\} \}$
           $∪ \{ (p''⋅P⋅s,q''⋅Q⋅t) \mid (p'',q'') ∈ S' \} = succ_{P'}(P_i)$,
-          it represents $R_i$ in $P'$.
+          it represents $R$ in $P'$.
 
           Then as $P'$ is a partition for $T$ having a rule representing each part
           with $n - 1$ element, we can apply the induction hypothesis and obtain
@@ -560,20 +475,20 @@ mPRS $(\Dmay, \Dmust)$ such that $\Dmust$ is a vPDA.
       Now we need to show there is a partition represented by attack rules.
       If we initially take $P = subtrees(T)$, for each
       $R ∈ P$ we have:
-      There is an attacking transition from $root(R)$ which induced $R$.
-      As $succ_P(R) = closededge(R)$, for each $R' ∈ succ_P(R)$
-      there is a fitting defending transition to $root(R')$ and vice-versa.
+      There is an attacking transition from $R_r$ which induced $R$.
+      As $succ_P(R) = R_C$, for each $R' ∈ succ_P(R)$
+      there is a fitting defending transition to $R'_r$ and vice-versa.
       If $p⋅s \may[a] p'⋅s$ was induced by $(p, a, p') ∈ \Dmay$ and
       each $q⋅t \may[a] q'⋅t$ was induced by $(q, a, q') ∈ \Dmay$, then
       $(p,q) \attack \{ (p',q') \mid (q, a, q') \}$ represents R % TODO
 
       Finally for a rule $(p,q) \attack S$ representing
-      the closed tree $T$ with $root(T) = (P⋅S,Q⋅T)$, necessarily
+      the closed tree $T$ with $T_r = (P⋅S,Q⋅T)$, necessarily
       $(p,q) = (P⋅S,Q⋅T)$ and $S = ∅$.
 
     \Leftarrow:
       We show that if $(p,q) \attack S$, then there is a tree
-      $T$ with $root(T) = (p,q)$ such that $open(T) = S$
+      $T$ with $T_r = (p,q)$ such that $open(T) = S$
       by induction on the construction of $(p,q) \attack S$:
       \begin{enumerate}
         \item It was constructed by rule 1 from $(p, a, p') ∈ \Dmay$. Then there is
@@ -593,25 +508,25 @@ mPRS $(\Dmay, \Dmust)$ such that $\Dmust$ is a vPDA.
           $(p',q') \attack S'$ with $S = S'' ∪ S'''$ and
           $S''' = \{  (p''⋅P, q''⋅Q) \mid (p'',q'') ∈ S' \}$.
           Then by induction hypothesis there is
-          a tree $T'$ with $root(T') = (p',q')$ and $open(T') = S'$ and
-          a tree $T''$ with $root(T'') = (p,q)$ and $open(T'') = S'' \uplus \{(p'⋅P,q'⋅Q)\}$.
-          By appying lemma \ref{lemma:tree-lift} on $T'$ there is a tree
-          $T'''$ with $root(T''') = (p'⋅P,q'⋅Q)$,
+          a tree $T'$ with $T'_r = (p',q')$ and $open(T') = S'$ and
+          a tree $T''$ with $T''_r = (p,q)$ and $open(T'') = S'' \uplus \{(p'⋅P,q'⋅Q)\}$.
+          By applying lemma \ref{corollary:tree-lift} on $T'$ there is a tree
+          $T'''$ with $T'''_r = (p'⋅P,q'⋅Q)$,
           $open(T''') = O''' \uplus \{(p'⋅P,q'⋅Q)\}$ and
           $O''' = \{ (p''⋅P, q''⋅Q) \mid (p'',q'') ∈ S' \} = S'''$.
           By applying lemma \ref{lemma:tree-composition} on $T''$ and $T'''$ there is
-          a tree $T$ with $root(T) = (p,q)$ and $open(T) = S'' ∪ S''' = S$.
+          a tree $T$ with $T_r = (p,q)$ and $open(T) = S'' ∪ S''' = S$.
         \item It was constructed by rule 4 from
           $(p,q) \attack S'' \uplus \{(p',q')\} $ and
           $(p',q') \attack S'$ with $S = S'' ∪ S'$.
           Then by induction hypothesis there is
-          a tree $T'$ with $root(T') = (p',q')$ and $open(T') = S'$ and
-          a tree $T''$ with $root(T'') = (p,q)$ and $open(T'') = S'' \uplus \{(p',q')\}$.
+          a tree $T'$ with $T'_r = (p',q')$ and $open(T') = S'$ and
+          a tree $T''$ with $T''_r = (p,q)$ and $open(T'') = S'' \uplus \{(p',q')\}$.
           By applying lemma \ref{lemma:tree-composition} on $T'$ and $T''$ there is
-          a tree $T$ with $root(T) = (p,q)$ with $open(T) = S'' ∪ S' = S$.
+          a tree $T$ with $T_r = (p,q)$ with $open(T) = S'' ∪ S' = S$.
       \end{enumerate}
       Therefore if $(P⋅S,Q⋅T) \attack ∅$, then there is a tree
-      $T$ with $root(T) = (P⋅S,Q⋅T)$ and $open(T) = ∅$.
+      $T$ with $T_r = (P⋅S,Q⋅T)$ and $open(T) = ∅$.
 \end{proof}
 
 % theory and background
