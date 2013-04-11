@@ -58,6 +58,7 @@
 \newtheorem{lemma}{Lemma}
 \newtheorem{theorem}{Theorem}
 \newtheorem{corollary}{Corollary}
+\newtheorem{example}{Example}
 \theoremstyle{remark}
 \newtheorem{remark}{Remark}
 
@@ -65,9 +66,33 @@
 % tikz options
 \tikzset{  
   state/.style={text centered, rectangle, draw},
-  attack/.style={below=0.8em},
-  defense/.style={above=0.1em},
+  openstate/.style={text centered, rectangle, rounded corners=3mm, draw},
+  attack/.style={below=-0.7em},
+  label/.style={left=5.0em},
+  attlabel/.style={left=14.0em},
+  defense/.style={above=-0.2em},
   grow=right,
   sloped,
   edge from parent/.style={->,draw,shorten >=5pt, shorten <=5pt},
+}
+
+% listings options
+\lstset{
+%  breakindent=0em,
+%  language=XML,
+%  basicstyle=\footnotesize,
+%  numbers=left,
+%  numberstyle=\footnotesize,
+%  stepnumber=2,
+%  numbersep=5pt,
+%  backgroundcolor=\color{white},
+%  showspaces=false,
+%  showstringspaces=false,
+%  showtabs=false,
+%  frame=single,
+%  tabsize=2,
+%  captionpos=b,
+  breaklines=true,
+  breakatwhitespace=true,
+  breakautoindent=true,
 }

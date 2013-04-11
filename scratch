@@ -1,0 +1,53 @@
+\begin{figure}[ht]
+  \centering
+\begin{tikzpicture}[
+  level 1/.style={level distance=6cm, sibling distance=3.5cm},
+  level 2/.style={level distance=8cm, sibling distance=2cm},
+  level 3/.style={level distance=7cm, sibling distance=2cm},
+  edge from parent path={(\tikzparentnode.east) -- (\tikzchildnode.west)},
+  scale=0.6,
+  every node/.style={scale=0.6}
+]
+\node[state] {$(P⋅S,Q⋅S)$}
+    child {
+        node[state] {$(P⋅M⋅S,Q⋅T⋅S)$}
+        child {
+          node[state] {$(P⋅M⋅M⋅S,Q⋅T⋅T⋅S)$}
+          child {
+            node[state] {$(C⋅M⋅T,Q⋅T⋅S)$}
+            node[attack] {$Q⋅T \must[tea] Q $}
+            edge from parent
+            node[defense] {$Q⋅T \may[coffee] Q $}
+          }
+          node[attack] {$P⋅M \may[coffee] C $}
+          edge from parent
+          node[defense] {$Q⋅T \may[coin] Q⋅T⋅T $}
+        }
+        node[attack] {$P⋅M \may[coin] P⋅M⋅M $}
+        edge from parent
+        node[defense] {$Q⋅S \may[coin] Q⋅T⋅S $}
+    }
+    child {
+        node[state] {$(P⋅M⋅S,Q⋅C⋅S)$}
+        child {
+          node[state] {$(P⋅M⋅M⋅S,Q⋅C⋅C⋅S)$}
+          child {
+            node[state] {$(T⋅M⋅S,Q⋅C⋅S)$}
+            node[attack] {$Q⋅C \must[coffee] Q $}
+            edge from parent
+            node[defense] {$Q⋅C \may[tea] Q $}
+          }
+          node[attack] {$P⋅M \may[tea] T $}
+          edge from parent
+          node[defense] {$Q⋅C \may[coin] Q⋅C⋅C $}
+        }
+        node[attack] {$P⋅M \may[coin] P⋅M⋅M $}
+        edge from parent
+        node[defense] {$Q⋅S \may[coin] Q⋅C⋅S $}
+    }
+    node[attack] {$P⋅S \may[coin] P⋅M⋅S $}
+    ;
+\end{tikzpicture}
+  \caption{Initial attack trees vending machine MTS}\label{pq-attack-tree}
+\end{figure}
+

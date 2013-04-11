@@ -1,6 +1,8 @@
-\chapter{The algorithm}
+\chapter{The refinement algorithm}
 
 \section{Description}
+
+% TODO
 
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
@@ -16,27 +18,25 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 \begin{algorithmic}[1]
 \Function{AttackRules}{$mvPDA = (\Dmay, \Dmust)$}
   \State $rules ← ∅$
-  \For{$P,Q,S,T ∈ Const, a ∈ Act, type ∈ \{\text{may},\text{must}\}$}
-    \If{$type = \text{may}$}
+  \For{$P,Q,S,T ∈ Const(mvPDA), a ∈ Act(mvPDA)\}$}
+    \LineComment{Attack from left-hand side for may rules}
       \State $lhs ← (P⋅S, Q⋅T)$
-      \Comment{Attack from left-hand side for may rules}
-    \Else
-      \State $lhs ← (Q⋅T, P⋅S)$
-      \Comment{Attack from right-hand side for must rules}
-    \EndIf
-    %\State $lhs ← (p, q)(X, Y)$
-    \For{$(P⋅S, a, p') ∈ Δ_{type}$}
-      \State $rhs ← ∅$
-      \For{$(Q⋅T, a, q') ∈ Δ_{type}$}
-        \If{$type = \text{may}$}
-          \State $newRhs ← (p', q')$
-        \Else
-          \State $newRhs ← (q', p')$
-        \EndIf
-        \State $rhs ← rhs ∪ \{ newRhs \}$
+      \For{$(P⋅S, a, p') ∈ \Dmay$}
+        \State $rhs ← ∅$
+        \For{$(Q⋅T, a, q') ∈ \Dmay$}
+          \State $rhs ← rhs ∪ \{ (p', q') \}$
+        \EndFor
+        \State $rules ← rules ∪ \{(lhs, rhs)\}$
       \EndFor
-      \State $rules ← rules ∪ \{(lhs, rhs)\}$
-    \EndFor
+    \LineComment{Attack from right-hand side for must rules}
+      \State $lhs ← (Q⋅T, P⋅S)$
+      \For{$(Q⋅T, a, q') ∈ \Dmust$}
+        \State $rhs ← ∅$
+        \For{$(P⋅S, a, p') ∈ \Dmust$}
+          \State $rhs ← rhs ∪ \{ (p', q') \}$
+        \EndFor
+        \State $rules ← rules ∪ \{(lhs, rhs)\}$
+      \EndFor
   \EndFor
   \State \textbf{return} $rules$
 \EndFunction
@@ -50,7 +50,7 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 \begin{algorithmic}[1]
   \Function{Combine}{$lhsRule = (lhs, lhsRhsSet), rhsRule = (rhsLhs, rhsSet)$}
   \State $rules ← ∅$
-  \If{$\forall rhs ∈ rhsSet : size(rhs) ≤ 1$}
+  \If{$\forall rhs ∈ rhsSet : size(rhs) = 1$}
     \For{$lhsRhs ∈ lhsRhsSet : lhsRhs = rhsLhs⋅p$}
       \State $newRhs ← (lhsRhsSet ∖ lhsRhs) ∪ \{ rhs⋅p \mid rhs ∈ rhsSet \}$
       \State $rules ← rules ∪ \{ (lhs, newRhs) \}$
@@ -67,8 +67,7 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 \caption{Refinement algorithm for mvPDAs}
 \begin{algorithmic}[1]
 \Function{VPDARefinement}{$P⋅S, Q⋅T, mvPDA$}
-  \Comment{$P⋅S ≤_m Q⋅T$}
-  \State $initial ← [P⋅S, Q⋅T]$
+  \State $initial ← (P⋅S, Q⋅T)$
   \State $rules ← \Call{AttackRules}{mvPDA}$
   \While{$\exists lhsRule, rhsRule ∈ rules :
       \Call{Combine}{lhsRule, rhsRule} ⊄ rules $}
@@ -81,18 +80,20 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 
 \section{Soundness and completeness}
 
-The set of attack rules over a finite set of constants
-is also finite.
-As the algorithm never adds a rule twice to its set
-of rules, it will terminate.
+Soundness follows from theorem \ref{theorem:refinement-tree} and
+theorem \ref{theorem:tree-attack}.
+For an input mvPDA with the refinement problem $P⋅S ≤_m Q⋅T$,
+if the algorithm returns \textbf{true},
+then $P⋅S ≤_m Q⋅T$, and if
+if the algorithm returns \textbf{false},
+then $¬(P⋅S ≤_m Q⋅T)$.
 
-With termination, 
-from theorem \label{theorem:refinement-tree} and
-theorem \label{theorem:tree-attack} it follows
-that it returns \textbf{true} if and only
-if $P⋅S ≤_m Q⋅T$
-
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+For completeness we only need to show that the algorithm always terminates.
+The algorithm never adds a rule twice to its set of rules, and each iteration
+of the while loop adds at least one rule.
+As the set of possible attack rules over a finite set of constants is finite,
+and the algorithm only uses constants from the finite mvPDA, termination
+follows directly.
 
 % proof: no refinement => algorithm outputs false
 % proof: algorithm outputs false => no refinement
@@ -106,25 +107,54 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 
 \section{Optimizations}
 
-\paragraph{Worklist algorithm}
-% hash map for looking up lhs/rhs
+The algorithm as given above in pseudocode gives a naive implementation and can be improved
+in several ways. While these do not reduce the worst-case complexity,
+on many inputs a significant speedup is measurable.
+The following are the main optimizations used in the actual implementation.
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+\paragraph{Worklist algorithm}
+
+Instead of iterating over the entire set of rules to find matching rules, new rules are
+added to a worklist.
+The main loop of the algorithm removes new rules one at a time, adds
+the new rule to the set of rules and combines it with all matching rules.
+Newly obtained rules are then added to the worklist again. 
 
 \paragraph{Hash map lookup}
 % hash map for looking up lhs/rhs
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Again for finding a matching rules, iterating over all rules can take exponential time.
+A better approach is to seperate the rules into left-hand side rules and right-hand side
+rules, and for each state $(P⋅S,Q⋅T)$, keep a reference to all rules of each type
+that apply from that state.
+Specifically, if we have a rule $(p,q) \attack S$, if it is a right-hand side rule keep
+a reference to that rule from $(p,q)$, and if it is left-hand side rule keep a reference
+from each $(P⋅S,Q⋅T)$ where $(P⋅S,Q⋅T) ∈ S$ or $(P⋅S⋅S', Q⋅T⋅T') ∈ S$.
+That way, after taking a rule from the worklist matching can be performed in time linear
+to the number of matching rules.
 
 \paragraph{Keeping only minimial rules}
 % only keep smallest rhs rules
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+When there are two attack rules $(p,q) \attack S$ and $(p,q) \attack S'$ with
+$S ⊆ S'$, only the smaller needs rule $(p,q) \attack S$ needs to be kept and
+$(p,q) \attack S'$ can be removed.
+If we can obtain $(p,q) \attack ∅$ from a sequence that reduces $S'$,
+we can also obtain it from $S$.
+On the other hand, if there is no sequence that reduces $S'$,
+then there is also no sequence that reduces $S$.
+Therefore the correctness of the algorithm is not affected.
 
 \paragraph{Heuristic for combining rules}
 % try to use rules with smaller right-hand side first
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+With the optimization to only keep minimal rules, we would like to obtain these
+as early as possible. While finding the optimal strategy is as hard as solving the
+problem, a suitable heuristic is to choose rules $(p,q) \attack S$ with the smallest
+$S$ first.
+This strategy especially for non-refining process, where we have $S=∅$, which always
+leads to smaller rules.
+For the implementation, this means using a priority queue as the worklist.
 
 \paragraph{Reachable state exploration}
 % exploration of reachable states
@@ -136,46 +166,72 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
-
-\section{Input and output}
+\section{Usage}
 
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+% environment, java version, scala
 
-\subsection{Input grammar}
+\subsection{Input}
+
+similiar to existing tools \cite{Sickert12}.
+integrating into existing tools \cite{Stoll11}.
+
+any mPRS, not just mvPDA
+processes brought into normal form
 
 Whitespace is needed between keywords, but otherwise ignored.
 
-\paragraph{Common definitions}
+\begin{figure}
+\paragraph{mPRS definition}
 \begin{grammar}
-<letter> ::= "a" | … | "z" | "A" | … | "Z"
-<digit> ::= "0" | …  | "9"
-<id> ::= <letter>(<letter> | <digit>)*
+<mprs> ::= "mprs" <id> "[" <refinement> <rule>* "]"
+
+<refinement> ::= <process> "<=" <process>
+
+\end{grammar}
+
+\paragraph{Rule definition}
+\begin{grammar}
+<rule> ::= <process> <action> <ruletype> <process>
+
+<action> ::= <id>
+
+<ruletype> :: = <mayrule> | <mustrule>
+
+<mayrule> :: = "?"
+
+<mustrule> :: = "!"
 \end{grammar}
 
 \paragraph{Process definition}
 \begin{grammar}
 <process> ::= <empty> | <constant> | <parallel> | <sequential> | "(" <process> ")"
+
 <empty> ::= "_"
+
 <constant> ::= <id>
+
 <parallel> ::= <process> "." <process>
+
 <sequential> ::= <process> "|" <process>
 \end{grammar}
 
-\paragraph{Rule definition}
+\paragraph{Common definitions}
 \begin{grammar}
-<rule> ::= <process> <action> <rule_type> <process>
-<action> ::= <id>
-<rule_type> :: = <may_rule> | <must_rule>
-<may_rule> :: = "?"
-<must_rule> :: = "!"
-\end{grammar}
+<letter> ::= "a" | … | "z" | "A" | … | "Z"
 
-\paragraph{mPRS definition}
-\begin{grammar}
-<mprs> ::= "mprs" <id> "[" <refinement> <rules> "]"
-<refinement> ::= <process> "<=" <process>
-<rules> ::= <rule>*
+<digit> ::= "0" | …  | "9"
+
+<id> ::= <letter>(<letter> | <digit>)*
 \end{grammar}
+\label{fig:grammar}
+\caption{Grammar for input file}
+\end{figure}
+
+% TODO ref
+\lstinputlisting[caption=Input representing the vending machine mvPDA, label=listing:mprs-input]{example.mprs}
+
+\lstinputlisting[caption=Usage example, label=listing:usage-output]{output.txt}
 
 % now command line
 % future integration with gui
@@ -185,242 +241,25 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 
 \subsection{Calling the programm}
 
-\subsection{Output of the programm}
+\subsection{Output}
 
-\paragraph{Error codes}
+% table of error codes
 
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 \section{Performance evaluation}
 
-\paragraph{Refining processes}
+% TODO
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+%\paragraph{Refining processes}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+% Family of processes that refine
 
-\paragraph{Non-refining processes}
+%\paragraph{Non-refining processes}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+% Family of processes that do not refine
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+%\paragraph{Random processes}
 
-\paragraph{Random PRS}
+% Random PRS
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-\section{Example}
-
-Figure \ref{mvpda-p} and \ref{mvpda-q} define two mvPDA. The corresponding may transitions for the must transitions are implied.
-The problem is to decide whether $p⋅S ≤_m q⋅S$.
-
-\begin{figure*}[ht]
-  \centering
-  \begin{minipage}[b]{.4\textwidth}
-    \begin{align*}
-      P⋅S &\must[coin] P⋅M⋅S \\
-      P⋅M &\must[coin] P⋅M⋅M \\
-      P⋅M &\must[tea] T \\
-      P⋅M &\must[coffee] c \\
-      T⋅M &\must[tea] T \\
-      T⋅S &\must[coin] P⋅M⋅S \\
-      c⋅M &\must[coffee] c \\
-      c⋅S &\must[coin] P⋅M⋅S
-    \end{align*}
-    \caption{mvPDA for process $P⋅S$}\label{mvpda-p}
-  \end{minipage}\qquad
-  \begin{minipage}[b]{.4\textwidth}
-    \begin{align*}
-      Q⋅S &\may[coin] Q⋅T⋅S \\
-      Q⋅S &\may[coin] Q⋅C⋅S \\
-      Q⋅T &\may[coin] Q⋅T⋅T \\
-      Q⋅C &\may[coin] Q⋅C⋅C \\
-      Q⋅T &\must[tea] Q \\
-      Q⋅T &\may[coffee] Q \\
-      Q⋅C &\may[tea] Q \\
-      Q⋅C &\must[coffee] Q
-    \end{align*}
-    \caption{mvPDA for process $Q⋅S$}\label{mvpda-q}
-  \end{minipage}
-\end{figure*}
-
-\begin{figure*}[ht]
-  \centering
-\begin{tikzpicture}[
-  level 1/.style={level distance=6cm, sibling distance=3.5cm},
-  level 2/.style={level distance=8cm, sibling distance=2cm},
-  level 3/.style={level distance=7cm, sibling distance=2cm},
-  edge from parent path={(\tikzparentnode.east) -- (\tikzchildnode.west)},
-  scale=0.6,
-  every node/.style={scale=0.6}
-]
-\node[state] {$(p⋅S,q⋅S)$}
-    child {
-        node[state] {$(p⋅M⋅S,q⋅T⋅S)$}
-        child {
-          node[state] {$(p⋅M⋅M⋅S,q⋅T⋅T⋅S)$}
-          child {
-            node[state] {$(c⋅M⋅T,q⋅T⋅S)$}
-            node[attack] {$q⋅T \must[tea] q $}
-            edge from parent
-            node[defense] {$q⋅T \may[coffee] q $}
-          }
-          node[attack] {$p⋅M \may[coffee] c $}
-          edge from parent
-          node[defense] {$q⋅T \may[coin] q⋅T⋅T $}
-        }
-        node[attack] {$p⋅M \may[coin] p⋅M⋅M $}
-        edge from parent
-        node[defense] {$q⋅S \may[coin] q⋅T⋅S $}
-    }
-    child {
-        node[state] {$(p⋅M⋅S,q⋅C⋅S)$}
-        child {
-          node[state] {$(p⋅M⋅M⋅S,q⋅C⋅C⋅S)$}
-          child {
-            node[state] {$(T⋅M⋅S,q⋅C⋅S)$}
-            node[attack] {$q⋅C \must[coffee] q $}
-            edge from parent
-            node[defense] {$q⋅C \may[tea] q $}
-          }
-          node[attack] {$p⋅M \may[tea] T $}
-          edge from parent
-          node[defense] {$q⋅C \may[coin] q⋅C⋅C $}
-        }
-        node[attack] {$p⋅M \may[coin] p⋅M⋅M $}
-        edge from parent
-        node[defense] {$q⋅S \may[coin] q⋅C⋅S $}
-    }
-    node[attack] {$p⋅S \may[coin] p⋅M⋅S $}
-    ;
-\end{tikzpicture}
-  \caption{Tree for winning strategy}\label{pq-tree}
-\end{figure*}
-
-\begin{figure*}[ht]
-  \centering
-\begin{tikzpicture}[
-  level 1/.style={level distance=2cm, sibling distance=4cm},
-  level 2/.style={level distance=8cm, sibling distance=2cm},
-  level 3/.style={level distance=6cm, sibling distance=2cm},
-  northchild/.style={edge from parent path={(\tikzparentnode.north) -- (\tikzchildnode.south)}},
-  southchild/.style={edge from parent path={(\tikzparentnode.south) -- (\tikzchildnode.north)}},
-  rightchild/.style={edge from parent path={(\tikzparentnode.east) -- (\tikzchildnode.west)}},
-  scale=0.6,
-  every node/.style={scale=0.6}
-]
-\node[state] {$(p⋅S,q⋅S) \attack[] \{ (p⋅M⋅S,q⋅C⋅S), (p⋅M⋅S,q⋅T⋅S) \}$}
-    child[southchild] {
-      node[state] {$(p⋅M,q⋅T) \attack[] \{ (p⋅M⋅M,q⋅T⋅T) \}$}
-        child[rightchild] {
-          node[state] {$(p⋅M,q⋅T) \attack[] \{ (c,q) \} $}
-          child[rightchild] {
-            node[state] {$(c⋅M,q⋅T) \attack[] ∅$}
-            edge from parent
-            node[defense] {return}
-          }
-          edge from parent
-          node[defense] {call}
-        }
-        edge from parent
-        node[defense] {call}
-    }
-    child[northchild] {
-      node[state] {$(p⋅M,q⋅C) \attack[] \{ (p⋅M⋅M,q⋅C⋅C) \}$}
-        child[rightchild] {
-          node[state] {$(p⋅M,q⋅C) \attack[] \{ (T,q) \} $}
-          child[rightchild] {
-            node[state] {$(T⋅M,q⋅C) \attack[] ∅$}
-            edge from parent
-            node[defense] {return}
-          }
-          edge from parent
-          node[defense] {call}
-        }
-        edge from parent
-        node[defense] {call}
-    }
-    ;
-\end{tikzpicture}
-  \caption{Tree for winning strategy with attack rules}\label{pq-attack-tree}
-\end{figure*}
-
-\begin{figure*}[ht]
-  \centering
-\begin{tikzpicture}[
-  level 1/.style={level distance=10cm, sibling distance=4cm},
-  level 2/.style={level distance=8cm, sibling distance=2cm},
-  state/.style={text centered, rectangle, draw},
-  edge from parent path={(\tikzparentnode.east) -- (\tikzchildnode.west)},
-  scale=0.6,
-  every node/.style={scale=0.6}
-]
-\node[state] {$(p⋅S,q⋅S) \attack[] \{ (p⋅M⋅S,q⋅C⋅S), (p⋅M⋅S,q⋅T⋅S) \}$}
-    child {
-      node[state] {$(p⋅M,q⋅T) \attack[] \{ (c⋅M,q⋅T) \}$}
-        child {
-          node[state] {$(c⋅M,q⋅T) \attack[] ∅$}
-          edge from parent
-          node[defense] {internal}
-        }
-        edge from parent
-        node[defense] {call}
-    }
-    child {
-      node[state] {$(p⋅M,q⋅C) \attack[] \{ (T⋅M,q⋅C) \}$}
-        child {
-          node[state] {$(T⋅M,q⋅C) \attack[] ∅$}
-          edge from parent
-          node[defense] {internal}
-        }
-        edge from parent
-        node[defense] {call}
-    }
-    ;
-\end{tikzpicture}
-  \caption{Merged tree for winning strategy with attack rules after one step}\label{pq-attack-tree-1}
-\end{figure*}
-
-
-\begin{figure*}[ht]
-  \centering
-\begin{tikzpicture}[
-  level 1/.style={level distance=12cm, sibling distance=4cm},
-  edge from parent path={(\tikzparentnode.east) -- (\tikzchildnode.west)},
-  scale=0.6,
-  every node/.style={scale=0.6}
-]
-\node[state] {$(p⋅S,q⋅S) \attack[] \{ (p⋅M⋅S,q⋅C⋅S), (p⋅M⋅S,q⋅T⋅S) \}$}
-    child {
-      node[state] {$(p⋅M,q⋅T) \attack[] ∅$}
-        edge from parent
-        node[defense] {call}
-    }
-    child {
-      node[state] {$(p⋅M,q⋅C) \attack[] ∅$}
-        edge from parent
-        node[defense] {call}
-    }
-    ;
-\end{tikzpicture}
-  \caption{Merged tree for winning strategy with attack rules after two steps}\label{pq-attack-tree-2}
-\end{figure*}
-
-
-\begin{figure*}[ht]
-  \centering
-\begin{tikzpicture}[
-  edge from parent path={(\tikzparentnode.east) -- (\tikzchildnode.west)},
-  scale=0.6,
-  every node/.style={scale=0.6}
-]
-\node[state] {$(p⋅S,q⋅S) \attack[] ∅$};
-\end{tikzpicture}
-  \caption{Final merged tree for winning strategy}\label{pq-attack-tree-3}
-\end{figure*}
-
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.

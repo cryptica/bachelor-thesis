@@ -7,6 +7,10 @@
 \providecommand{\href}[2]{#2}
 \begin{thebibliography}{BKLS09}
 
+\bibitem[AM04]{AlurM04}
+Rajeev Alur and P.~Madhusudan, \emph{Visibly pushdown languages}, STOC (New
+  York), ACM Press, June ~13--15 2004, pp.~202--211.
+
 \bibitem[BK12]{BenesK12}
 Nikola Benes and Jan Kret{\'i}nsk{\'y}, \emph{Modal process rewrite systems},
   ICTAC (Abhik Roychoudhury and Meenakshi D'Souza, eds.), Lecture Notes in
@@ -21,8 +25,24 @@ Nikola Benes, Jan Kret{\'i}nsk{\'y}, Kim~Guldstrand Larsen, and Jir{\'i} Srba,
 Javier Esparza, \emph{Grammars as processes}, Lecture Notes in Computer Science
   \textbf{2300} (2001), 277--298.
 
+\bibitem[GH94]{GrooteH94}
+Jan~Friso Groote and Hans Hüttel, \emph{Undecidable equivalences for basic
+  process algebra}, Inf. Comput. \textbf{115} (1994), no.~2, 354--371.
+
+\bibitem[LT88]{LarsenT88}
+Kim~Guldstrand Larsen and Bent Thomsen, \emph{A modal process logic}, LICS,
+  1988, pp.~203--210.
+
 \bibitem[May00]{Mayr00}
 Richard Mayr, \emph{Process rewrite systems}, Inf. Comput \textbf{156} (2000),
   no.~1-2, 264--286.
+
+\bibitem[Sic12]{Sickert12}
+Salomon Sickert, \emph{Refinement algorithms for parametric modal transition
+  systems}, Bachelor's thesis, Technische Universität München, 2012.
+
+\bibitem[Sto11]{Stoll11}
+Martin Stoll, \emph{Motras : A tool for modal transition systems}, Bachelor's
+  thesis, Technische Universität München, 2011.
 
 \end{thebibliography}
