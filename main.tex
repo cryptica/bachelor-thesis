@@ -1,10 +1,17 @@
 % Document class, with margin for binding
 \documentclass[	pdftex, 
                 a4paper,
-                12pt, DIV11, BCOR5mm,
-                parskip,								
-                pointlessnumbers					
+                oneside,
+                BCOR5mm,
+                12pt,
+                parskip
                 ]{scrbook}
+%\documentclass[	pdftex, 
+%                a4paper,
+%                12pt, DIV11, BCOR5mm,
+%                parskip,								
+%                pointlessnumbers					
+%                ]{scrbook}
 
 % Mathematical packages
 \usepackage{amsmath}
@@ -33,6 +40,7 @@
 \usepackage{algpseudocode}
 \algnewcommand{\LineComment}[1]{\State \(\triangleright\) #1}
 \usepackage[nounderscore]{syntax}
+\usepackage{float}
 
 % References
 \usepackage[nottoc,notlof,notlot]{tocbibind} % Bibliograhy in table of contents

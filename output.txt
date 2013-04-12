@@ -1,4 +1,4 @@
-$ java -jar vmpda-refinement-checker.jar vendingmachine.mprs vpda.mprs non_vpda.mprs
+$ java -jar vmpda-refinement.jar vendingmachine.mprs vpda.mprs non_vpda.mprs
 [0] src/main/resources/vendingmachine.mprs (0.293342559 s)
 [1] src/main/resources/vpda.mprs (7.682377187 s)
 [E] src/main/resources/non_vpda.mprs (java.lang.IllegalArgumentException: Given mPRS is not an mvPDA)

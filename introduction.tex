@@ -4,13 +4,59 @@
 
 \chapter{Introduction}
 
-%Process rewrite systems
+As an extension to labelled transitions systems,
+modal transition systems (MTS) \cite{LarsenT88}
+have been widely used, especially in model checking.
+They provide a way to describe systems specifications
+in a way that allows stepwise refinement
+and composition of several refinements.
 
-% TODO
+An MTS has two transitions, \emph{may} transitions, which are admissible,
+and \emph{must} transitions, which are necessary.
+A refinement of an MTS should then keep all still be able to perform
+all must transitions and all transitions it can perform are may transitions.
+This way one can gradually produce finer specifications that still conform
+to the original specification, until one arrives at a concrete implementation.
+Alternatively one can produce coarser specifications for abstraction.
 
-% problem and motivation
-%Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+There are many types of MTS, 
+but formalisms to describe modal transitions systems with
+an infinite state space have only been explored recently \cite{BenesK12}.
+For transitions systems, one powerful framework to describe them are
+process rewrite systems (PRS) \cite{Mayr00, Esparza01}.
+They can be used to model many widely used systems
+such as pushdown automaton (PDA) or Petri nets (PN).
+By lifting PRS to the modal world, we obtain mPRS
+and their respective modal transitions systems such as
+mPDA or mPN.
 
-%Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Unfortunately, even for basic classes such as
+stateless PDA, known as binary process algebras (BPA), already simulation is
+undecidable \cite{GrooteH94}.
+As refinement is a generalization of both simulation and bisimulation,
+it is also undecidable on mBPAs and mPDAs.
 
-%Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+However there is the subclass of visibly pushdown automata (vPDA)
+of PDAs,
+which is closed under all desirable operations
+and for which most problems are decidable \cite{AlurM04}.
+They restrict the rules of a PDA by making visible which
+actions push a symbol on a stack and which pop one.
+They are still more expressive than finite automata 
+and can be used to specify certain properties about the stack.
+For example, they have been applied to check
+parenthesis-like matching in XML streaming
+\cite{KumarMV07}
+and checking pre/post-conditions for module calls
+in program analysis \cite{AlurEM04}.
+
+Therefore we would like to use the modal view on vPDAs
+as well to allow modal specifcations and abstractions and
+would want to test refinement between these.
+Fortunately, not only simulation and bisimulation
+is decidable \cite{Srba06},
+but also refinement \cite{BenesK12}.
+Here we present an algorithm to decide the modal refinement on mvPDAs.
+
+
+

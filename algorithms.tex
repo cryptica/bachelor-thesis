@@ -2,21 +2,51 @@
 
 \section{Description}
 
-% TODO
+The given theory then lead to the development of a program
+to solve the refinement problem for mvPDAs.
+This program should eventually be integrated into a tool
+for modal transitions systems called MoTraS \cite{Stoll11}.
+Therefore, to maintain cross-platform compatibility, it
+is written in Scala and Java, which allows to run on the JVM.
+The program can also be used on its own from the command line.
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Here we will describe the main parts of the program,
+some finer implementation details, the basic usage and
+show the performance results of several benchmarks.
 
 \section{Implementation}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+The essential parts of the algorithm are be shown here in pseudocode.
+The main entry point is the function {\scfont{mvPDARefinement}} shown
+in figure \ref{alg:mvpad-refining}.
+It takes as input two initial processes $P⋅S$, $Q⋅T$ and an mvPDA.
+It initialises the rules with the set of basic rules and enters a loop.
+As long as there are two rules in the set of rules such that they can be combined
+into new rules not completely contained in the set of rules, the new rules will be added.
+This will compute the fixpoint of the set of rules under the combination of rules.
+Then it returns if the refinement $P⋅S ≤_m Q⋅T$ holds by testing if the empty
+rule is contained from the initial state.
 
-% pseudocode
-\begin{figure}[ht]
-\caption{Algorithm for calculating the basic attack rules on mvPDAs}
+\begin{figure}[H]
 \begin{algorithmic}[1]
-\Function{AttackRules}{$mvPDA = (\Dmay, \Dmust)$}
+\Function{mvPDARefinement}{$P⋅S, Q⋅T, mvPDA$}
+  \State $initial ← (P⋅S, Q⋅T)$
+  \State $rules ← \Call{makeRules}{mvPDA}$
+  \While{$\exists lhsRule, rhsRule ∈ rules :
+      \Call{Combine}{lhsRule, rhsRule} ⊄ rules $}
+    \State $rules ← rules ∪ \Call{combine}{lhsRule, rhsRule}$
+  \EndWhile
+  \State \textbf{return} $(initial, ∅) ∈ rules$
+\EndFunction
+\end{algorithmic}
+\label{alg:mvpad-refining}
+\caption{Algorithm for testing refinement on an mvPDA}
+\vspace{-0.2cm} % TODO bad use
+\end{figure}
+
+\begin{figure}[H]
+\begin{algorithmic}[1]
+\Function{makeRules}{$mvPDA = (\Dmay, \Dmust)$}
   \State $rules ← ∅$
   \For{$P,Q,S,T ∈ Const(mvPDA), a ∈ Act(mvPDA)\}$}
     \LineComment{Attack from left-hand side for may rules}
@@ -41,14 +71,13 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
   \State \textbf{return} $rules$
 \EndFunction
 \end{algorithmic}
+\label{alg:make-rules}
+\caption{Algorithm for creating the basic attack rules on an mvPDA}
 \end{figure}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-\begin{figure}[ht]
-\caption{Algorithm for combining attack rules}
+\begin{figure}[H]
 \begin{algorithmic}[1]
-  \Function{Combine}{$lhsRule = (lhs, lhsRhsSet), rhsRule = (rhsLhs, rhsSet)$}
+  \Function{combine}{$lhsRule = (lhs, lhsRhsSet), rhsRule = (rhsLhs, rhsSet)$}
   \State $rules ← ∅$
   \If{$\forall rhs ∈ rhsSet : size(rhs) = 1$}
     \For{$lhsRhs ∈ lhsRhsSet : lhsRhs = rhsLhs⋅p$}
@@ -59,28 +88,32 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
   \State \textbf{return} $rules$
 \EndFunction
 \end{algorithmic}
+\label{alg:rule-combining}
+\caption{Algorithm for combining attack rules}
 \end{figure}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+The function {\scfont{makeRules}} shown in figure \ref{alg:make-rules}
+takes an mvPDA as input and rules and returns the attack rules
+that can be constructed out of the rewrite rules in the mvPDA.
+This is basically the implementation of the inference rules 1 and 2
+for attack rules.
 
-\begin{figure}[ht]
-\caption{Refinement algorithm for mvPDAs}
-\begin{algorithmic}[1]
-\Function{VPDARefinement}{$P⋅S, Q⋅T, mvPDA$}
-  \State $initial ← (P⋅S, Q⋅T)$
-  \State $rules ← \Call{AttackRules}{mvPDA}$
-  \While{$\exists lhsRule, rhsRule ∈ rules :
-      \Call{Combine}{lhsRule, rhsRule} ⊄ rules $}
-    \State $rules ← rules ∪ \Call{Combine}{lhsRule, rhsRule}$
-  \EndWhile
-  \State \textbf{return} $(initial, ∅) ∈ rules$
-\EndFunction
-\end{algorithmic}
-\end{figure}
+The function {\scfont{combine}} shown in figure \ref{alg:make-rules}
+then takes two rules and returns all rules that be constructed by
+combining the two rules.
+Note that the rules $lhsRule$ and $rhsRule$ are not required to
+be actually left-hand side and right-hand side rules, but if they are
+not, simply the empty set is returned.
+Otherwise all combinations allowed by the inference rules 3 and 4
+are formed and returned.
+
+% TODO some more
 
 \section{Soundness and completeness}
 
-Soundness follows from theorem \ref{theorem:refinement-tree} and
+As the algorithm constructs exactly all the attack rules
+allowed by the inference rules,
+soundness follows from theorem \ref{theorem:refinement-tree} and
 theorem \ref{theorem:tree-attack}.
 For an input mvPDA with the refinement problem $P⋅S ≤_m Q⋅T$,
 if the algorithm returns \textbf{true},
@@ -91,19 +124,26 @@ then $¬(P⋅S ≤_m Q⋅T)$.
 For completeness we only need to show that the algorithm always terminates.
 The algorithm never adds a rule twice to its set of rules, and each iteration
 of the while loop adds at least one rule.
-As the set of possible attack rules over a finite set of constants is finite,
-and the algorithm only uses constants from the finite mvPDA, termination
-follows directly.
+The set of possible attack rules over a finite set of constants is finite,
+and the algorithm only uses constants from the finite mvPDA, therefore it
+will terminate.
 
-% proof: no refinement => algorithm outputs false
-% proof: algorithm outputs false => no refinement
-% termination proof
+\section{Complexity}
 
-\section{Runtime}
+Let $k = |Const|$ be the number of constants appearing in the input mvPDA.
+For a rule $(p,q) \attack S$, as
+$(p, q) ∈ \{ (P⋅S,Q⋅T) \mid P,S,Q,T ∈ Const \}$, there are $k^4$ possible states for $(p,q)$.
+F or each $(p',q') ∈ S$, as $(p',q') ∈ \{ (p,q) \mid |p| ≤ 3 ∧ |q| ≤ 3 ∧ p,q \text{ sequential} \}$,
+there are at most $k^6$ possible states. With the number of subsets $S$ being in
+$\mathcal O(2^{k^6})$, the number of possible rules is in $\mathcal O(k^4 2^{k^6})$.
+An input of size $n$ can define $\mathcal O(n)$ constants, therefore the worst-case
+complexity is $\mathcal O(n^4 2^{n^6}) = \mathcal O(2^{n^6}) ⊆ \text{EXPTIME}$.
+The refinement problem on mvPDA is EXPTIME-complete \cite{BenesK12}, indicating there
+is quite possibly no better solution.
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-% tests with complete number
+However this is only the worst-case complexity and only needed by mvPDA with rules of
+a certain structure. For many types of inputs, the algorithm only needs
+polynomial time.
 
 \section{Optimizations}
 
@@ -116,25 +156,23 @@ The following are the main optimizations used in the actual implementation.
 
 Instead of iterating over the entire set of rules to find matching rules, new rules are
 added to a worklist.
-The main loop of the algorithm removes new rules one at a time, adds
+The main loop of the algorithm removes new rules from the worklist one at a time, adds
 the new rule to the set of rules and combines it with all matching rules.
 Newly obtained rules are then added to the worklist again. 
 
 \paragraph{Hash map lookup}
-% hash map for looking up lhs/rhs
 
 Again for finding a matching rules, iterating over all rules can take exponential time.
-A better approach is to seperate the rules into left-hand side rules and right-hand side
+A better approach is to separate the rules into left-hand side rules and right-hand side
 rules, and for each state $(P⋅S,Q⋅T)$, keep a reference to all rules of each type
 that apply from that state.
 Specifically, if we have a rule $(p,q) \attack S$, if it is a right-hand side rule keep
 a reference to that rule from $(p,q)$, and if it is left-hand side rule keep a reference
 from each $(P⋅S,Q⋅T)$ where $(P⋅S,Q⋅T) ∈ S$ or $(P⋅S⋅S', Q⋅T⋅T') ∈ S$.
-That way, after taking a rule from the worklist matching can be performed in time linear
+That way, after taking a rule from the worklist, matching can be performed in time linear
 to the number of matching rules.
 
 \paragraph{Keeping only minimial rules}
-% only keep smallest rhs rules
 
 When there are two attack rules $(p,q) \attack S$ and $(p,q) \attack S'$ with
 $S ⊆ S'$, only the smaller needs rule $(p,q) \attack S$ needs to be kept and
@@ -146,40 +184,63 @@ then there is also no sequence that reduces $S$.
 Therefore the correctness of the algorithm is not affected.
 
 \paragraph{Heuristic for combining rules}
-% try to use rules with smaller right-hand side first
 
 With the optimization to only keep minimal rules, we would like to obtain these
 as early as possible. While finding the optimal strategy is as hard as solving the
 problem, a suitable heuristic is to choose rules $(p,q) \attack S$ with the smallest
 $S$ first.
-This strategy especially for non-refining process, where we have $S=∅$, which always
-leads to smaller rules.
+This strategy especially for non-refining process, where we rules have $S=∅$,
+which always leads to smaller rules.
 For the implementation, this means using a priority queue as the worklist.
 
 \paragraph{Reachable state exploration}
-% exploration of reachable states
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Instead of initialising the set of rules with rules from all possible states,
+we can add rules as we reach a state.
+Reachability is decidable on PDAs \cite{BouajjaniEM97} and we can apply that
+to the combined states of our attack rules.
+We start with the initial state, and whenever we obtain a new state on the right-hand
+side as an internal or call state, we add the attack rules from that state.
+This also reduces the added complexity of combining two mvPDA with no shared states
+into a single mvPDA.
 
 \paragraph{Early stopping}
-% early stopping
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Instead of computing all possible rules and then testing if the empty is obtained,
+we can stop as soon as we find $(P⋅S,Q⋅T) \attack ∅$ and return \textbf{false}.
+However, this only improves the runtime if the processes do not refine.
+If they refine, the algorithm has to explore all the possible rules before
+returning \textbf{true}.
 
 \section{Usage}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+The refinement algorithm can be called from the command line via
+\begin{verbatim}
+java -jar vmpda-refinement.jar <files>
+\end{verbatim}
+where \verb+<files>+ is a list of space-separated input files.
+
+%Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+% TODO: how to call it
 % environment, java version, scala
 
 \subsection{Input}
 
-similiar to existing tools \cite{Sickert12}.
-integrating into existing tools \cite{Stoll11}.
+Each ipnut for the program is given in a file containing the processes
+to test for refinement and the rewrite rules of the mvPDA.
+The file format used here is similiar to ones used in existing
+tools \cite{Sickert12} to ease the integration with the MoTraS tool.
+In figure \ref{fig:grammar} the grammar is given. For clarity,
+whitespace is not explicitly noted, but needed between identifiers.
+At other places it is ignored.
 
-any mPRS, not just mvPDA
-processes brought into normal form
-
-Whitespace is needed between keywords, but otherwise ignored.
+A valid input needs to specify $\left< mprs \right>$ with the refinement problem and
+the rules.
+Note that any mPRS can be defined in the grammer, but the algorithm
+tests if it is an actual mvPDA and outputs an error otherwise.
+After parsing the input, the algorithm may rewrite the processes
+to bring them in a normal form in accordance to the congruence relation
+of the operators.
 
 \begin{figure}
 \paragraph{mPRS definition}
@@ -225,27 +286,61 @@ Whitespace is needed between keywords, but otherwise ignored.
 <id> ::= <letter>(<letter> | <digit>)*
 \end{grammar}
 \label{fig:grammar}
-\caption{Grammar for input file}
+\caption{Grammar for the input files}
 \end{figure}
 
-% TODO ref
-\lstinputlisting[caption=Input representing the vending machine mvPDA, label=listing:mprs-input]{example.mprs}
+\newpage % TODO remove
 
-\lstinputlisting[caption=Usage example, label=listing:usage-output]{output.txt}
+\begin{example}
+Listing \ref{listing:mprs-input} gives the
+input for our vending machine mvPDA from figure \ref{fig:vending-mvpda}.
+\end{example}
+
+\lstinputlisting[caption=Input representing the vending machine mvPDA, label=listing:mprs-input]{example.mprs}
 
 % now command line
 % future integration with gui
 % similiar input file to existing programs
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+% TODO
 
-\subsection{Calling the programm}
+%Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+%\subsection{Calling the programm}
 
 \subsection{Output}
 
-% table of error codes
+After calling the program with a list of input files, the program prints
+a line with the result of the refinement test for each input.
+The line consists of a result code, the filename and the running time
+in case of successful execution. The result codes are explained in
+figure \ref{fig:result-codes}.
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+\begin{figure}[ht]
+  \centering
+  \begin{tabular}{l|l}
+    Result code & Meaning \\
+    \hline
+    {0} & The processes refine \\
+    {1} & The processes do not refine  \\
+    {E} & There was an exception
+  \end{tabular}
+  \label{fig:result-codes}
+  \caption{Result codes}
+\end{figure}
+
+Possible causes for exceptions are I/O Exceptions when reading the file,
+parsing exceptions for malformed input or illegal argument exceptions
+when the input does not represent an mvPDA.
+
+\begin{example}
+Listing \ref{listing:usage-output} shows the output from the run
+of the program on three input files. The first one is the vending machine mvPDA
+and the algorithm shows it does not refine, the second one is refining example
+and the third is an invalid input, where the given mPRS is not an mvVPDA.
+\end{example}
+
+\lstinputlisting[caption=Usage example, label=listing:usage-output]{output.txt}
 
 \section{Performance evaluation}
 

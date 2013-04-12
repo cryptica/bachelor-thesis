@@ -54,10 +54,15 @@ of \emph{general processes} \textbf{G}.
 
 \section{Modal transition system}
 
-Modal transitions systems \cite{LarsenT88, BenesKLS09, BenesK12} extend
-labelled transition system with two types of transitions, may and must transitions.
-The idea is that a refinement of system must keep any must transitions,
-while it may only have may transitions present in the original system.
+Modal transition systems are an extension of labeled transition systems
+with two types of transitions, may and must transitions.
+The intuition behind MTS is that in an refining system of an MTS,
+all must transitions have to be present,
+while the may transitions are allowed but not required.
+%Modal transitions systems \cite{LarsenT88, BenesKLS09, BenesK12} extend
+%labelled transition system with two types of transitions, may and must transitions.
+%The idea is that a refinement of system must keep any must transitions,
+%while it may only have may transitions present in the original system.
 
 \begin{definition}[Modal transition system]
 A \emph{modal transition system (MTS)} over an action alphabet $Act$ is
@@ -94,7 +99,8 @@ the disjoint union of the MTS.
   \end{enumerate}
   Modal refinement can also be seen as a refinement game from a pair of processes
   $(p,q)$ where each side plays an attacking transition and the other a defending transition
-  to reach a new state.
+  to reach a new state. This type of game is often used to decide simulation or
+  bisimulation \cite{Srba06}.
 
   Thus if from the state $(p,q)$ there is a transition $p \may[a] p'$ or $q \may[a] q'$,
   we will call this an \emph{attacking transition} and a transition
@@ -112,8 +118,8 @@ the disjoint union of the MTS.
 A modal process rewrite system is a framework
 for defining a modal transition system by a finite set of rules.
 They are a straightforward extension of process rewrite systems,
-which can be used to model many transition systems such as
-pushdown automaton or Petri nets \cite{Mayr00, Esparza01}.
+which can then model many transition systems such as
+pushdown automaton or Petri nets.% \cite{Mayr00, Esparza01}.
 
 \begin{definition}[Modal process rewrite system]
 A \emph{process rewrite system (PRS)} over an action alphabet $Act$
@@ -135,17 +141,10 @@ An mPRS $(\Dmay, \Dmust)$ induces an MTS $(\mc P, \may[], \must[])$ as follows:
 
 \section{Visibly pushdown automaton}
 
-One subclass of PRS are pushdown automata (PDA).
-Already for its subclass of basic process
-algebras (BPA) simulation is undecidable \cite{GrooteH94} and
-therefore also refinement.
-For the subclass of visibly PDA however,
-most problems are decidable and its class of languages
-is closed under all desirable operations \cite{AlurM04}.
-Especially refinement on its modal extension is decidable, as
-shown in \cite{BenesK12}.
-
-% tree not computable
+A subclass of pushdown automata (PDA),
+visibly pushdown automata (vPDA) partition
+their action alphabet such that each action
+either is a call, internal or return transition.
 
 \begin{definition}[Visibly pushdown automaton]
 A PRS $Δ$ over the action alphabet $Act$ is a
@@ -413,7 +412,7 @@ of the refinement relation.
   level 1/.style={level distance=9cm, sibling distance=2cm},
   edge from parent path={(\tikzparentnode.east) -- (\tikzchildnode.west)},
 ]
-  \node (T1) {$(P⋅S,Q⋅S)$}
+  \node[state] (T1) {$(P⋅S,Q⋅S)$}
     child {
         node[openstate] {$(P⋅M⋅S,Q⋅C⋅S)$}
         edge from parent
