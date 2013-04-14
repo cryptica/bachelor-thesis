@@ -2,21 +2,41 @@
 
 \section{Main results}
 
-% TODO
+In this thesis, an algorithm for deciding refinement
+between modal visibly pushdown automata was presented.
+This was done by use of modal process rewrite systems
+and a new representation of refinement by attack trees.
 
-%Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+The theoretical part introduced the concepts and showed
+correctness of the construction.
+The practical part described the implementation,
+including some optimizations, and analyzed the
+complexity with theoretical bounds and a performance evaluation.
+This showed the unavoidable exponential runtime and
+conditions on input which produce or avoid it.
 
-%Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+This will hopefully contribute to the usage of mvPDAs
+in the fields applying modal transitions systems, such as in
+system specifications and model checking, by providing
+a sound and complete way to test refinement.
 
 \section{Further extensions}
-% conclusion, further improvements
 
-% provide counterexample
+Even with the exponential runtime, there are certainly
+more possible optimizations to improve the runtime.
+One possibility would be deciding positive refinement in certain cases before
+exploring the whole rule space, for example by showing that there are
+loops from each attack transition.
+It should also be possible to show that the worst-time complexity
+is always $2^{\mathcal O(n^2)}$ instead of $2^{\mathcal O(n^6)}$.
 
-% recognize refining processes, recognize subclasses
+Further development in this area would then developing algorithms to
+decide refinement between other classes of mPRS where it is possible, for example
+between finite mFSM and general mPRS \cite{BenesK12}. Also there could be
+special treatment for mvBPA, for which the refinement is PTIME-complete.
 
-% implement refinement between other classes
+The tool should then be integrated into the MoTraS system to be made
+available for end users. Then more options could be added, for example
+more verbose output such as optionally providing a counterexample
+in case of negative refinement.
 
-%Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-%Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.

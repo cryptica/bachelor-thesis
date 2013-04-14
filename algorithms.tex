@@ -137,11 +137,11 @@ F or each $(p',q') ∈ S$, as $(p',q') ∈ \{ (p,q) \mid |p| ≤ 3 ∧ |q| ≤ 3
 there are at most $k^6$ possible states. With the number of subsets $S$ being in
 $\mathcal O(2^{k^6})$, the number of possible rules is in $\mathcal O(k^4 2^{k^6})$.
 The main loop of the algorithm is executed at most once for every possible rules,
-and its body can iterate over every rule created so far a constant amount of times $d$.
+and its body can iterate over every rule created so far a constant amount of times $c$.
 An input of size $n$ can define $\mathcal O(n)$ constants, therefore the worst-case
-complexity is $\mathcal O\left( n^4 2^{c' \cdot n^6} \right)^d =
-\mathcal O\left( n^{4d} 2^{d \cdot n^6} \right) =
-\mathcal O(2^{c \cdot n^6}) ⊆ \text{EXPTIME}$
+complexity is $\mathcal O\left( n^4 2^{n^6} \right)^c =
+\mathcal O\left( n^{4c} 2^{c \cdot n^6} \right) =
+\mathcal 2^{\mathcal O(n^6)} ⊆ \text{EXPTIME}$
 for some constant $c$.
 The refinement problem on mvPDA is EXPTIME-complete \cite{BenesK12}, indicating there
 is quite possibly no better solution.
@@ -194,7 +194,7 @@ On the other hand, if there is no sequence that reduces $S'$,
 then there is also no sequence that reduces $S$.
 Therefore the correctness of the algorithm is not affected.
 
-\paragraph{Removing rules that are not useful}
+%\paragraph{Removing rules that are not useful}
 % TODO
 
 \paragraph{Heuristic for combining rules}
@@ -230,7 +230,7 @@ returning \textbf{true}.
 
 The refinement algorithm can be called from the command line via
 \begin{verbatim}
-java -jar vmpda-refinement.jar <files>
+java -jar mvpda-refinement.jar <files>
 \end{verbatim}
 where \verb+<files>+ is a list of space-separated input files.
 
@@ -367,46 +367,87 @@ and the third is an invalid input, where the given mPRS is not an mvVPDA.
 
 \section{Performance evaluation}
 
-As seen in the complexity analysis,
+As seen in the complexity analysis, the runtime
+of the algorithm could possibly be exponential,
+which is quickly intractable even on small data.
+Here we will test different families of input data
+to see conditions that can lead to exponential runtime.
 
-It is int
+In each of the following benchmarks, a family
+of mvPDAs parametrized by an $n ∈ ℕ$ and
+a boolean $ref$ is given.
+On them we test the refinement $P_0⋅S ≤_m Q_0⋅S$.
+They have a number of rules linear an $n$
+and the refinement problem holds if $ref$ is true.
 
-On vPDAs, and even more on mvPDAs, there is not
+Looking at the construction rules for attack rules,
+we see that the main cause for exponential runtime
+are attack rules with a large right-hand
+side $S$. If a rule is applicable for
+every element of $S$, it can lead to $2^{|S|}$
+new rules. The size of $S$ is determined by
+the number of rules applicable from
+a state, which is the branching degree from a state.
+Therefore we will look at
+mvPDA with different branching degree
+for both the attacking and defending process.
 
-Quickly intractable
+Therefore as we want to construct attack rules with $|S|$ of
+certain sizes, it is enough to consider 
+It is enough to consider mvPDAs with the action alphabet
+$Act = \{ r, i, c \}$, for return, internal and
+call rules, respectively, and only may rules,
+as both action and rule type are discarded when constructing
+attack rules. The attacking process will then always be
+$P_0⋅S$ and the defending process $Q_0⋅S$.
 
-only may
-just three actions
+\paragraph{High local branching degree}
 
-benchmarks
-% TODO
-
-\paragraph{High branching degree}
-
-test $P_0⋅S_0 ≤_m Q_0⋅S_0$.
+For the first family of mvPDAs, we construct
+a process that has a high branching degree from
+a single state. Regard the mvPDA
+defined in figure \ref{fig:mvpda-high-local-branching}.
+From $Q_0⋅S$ there are $n$ defending transitions applicable to the
+rule attacking transition $P_0⋅S \may[c] P_1⋅S⋅S$.
+This will lead to an attack rule $(P_0⋅S,Q_0⋅S) \attack S'$ with $|S'| = n$.
+For each $(P_0⋅S⋅S, Q_0⋅S⋅S_i) ∈ S'$, there is a right-hand side
+applicable and therefore an exponential number of possible rules.
 
 \begin{figure}[ht]
   \centering
   \begin{minipage}[b]{.45\textwidth}
     \begin{align*}
-      P_0⋅S_0 &\may[c] P_1⋅S_0⋅S_0 \\
-      P_0⋅S_0 &\may[r] P_2 \\
-      P_2⋅S_0 &\may[c] P_3⋅S_0⋅S_0 \\
-      P_3⋅S_0 &\may[i] P_4⋅S_0 \\
-      P_4⋅S_0 &\may[r] P_5 && \text{if }¬ref
+      P_0⋅S &\may[c] P_1⋅S⋅S \\ % TODO check again new S
+      P_0⋅S &\may[r] P_2 \\
+      P_2⋅S &\may[c] P_3⋅S⋅S \\
+      P_3⋅S &\may[i] P_4⋅S \\
+      P_4⋅S &\may[r] P_5 && \text{if }¬ref
     \end{align*}
   \end{minipage}\quad
   \begin{minipage}[b]{.45\textwidth}
     \begin{align*}
-      Q_0⋅S_0 &\may[c] Q_1⋅S_0⋅S_i && ∀0 ≤ i < n \\
-      Q_1⋅S_0 &\may[r] Q_2 \\
-      Q_2⋅S_i &\may[c] Q_3⋅S_0⋅S_i && ∀0 ≤ i < n \\
-      Q_3⋅S_0 &\may[i] Q_4⋅S_i && ∀0 ≤ i ≤ n \\
+      Q_0⋅S &\may[c] Q_1⋅S⋅S_i && ∀0 ≤ i < n \\
+      Q_1⋅S &\may[r] Q_2 \\
+      Q_2⋅S_i &\may[c] Q_3⋅S⋅S_i && ∀0 ≤ i < n \\
+      Q_3⋅S &\may[i] Q_4⋅S_i && ∀0 ≤ i ≤ n \\
     \end{align*}
   \end{minipage}
-  \caption{mvPDA with high branching degree}
-  \label{fig:mvpda-high-branching}
+  \caption{mvPDA with high local branching}
+  \label{fig:mvpda-high-local-branching}
 \end{figure}
+
+Figure \ref{fig:bench-high-local-branching} shows the runtime and rules
+benchmark on this mvPDA on a logarithmic
+scale. As expected both grow exponentially with regard to $n$.
+
+Note that in the non-refining case, there is an attack tree with a
+small depth, which could be reduced in linear time by a certain
+combination of attack rules. However, as the construction creates
+another rule with degree $n+1$ from each $(P_0⋅S, S_i)$, with
+the combination heuristic this rule will not be regarded until
+all the combinations of the first rule are created. If another
+heuristic were to be used, the runtime in the non-refining case
+could be linear.
 
 \begin{figure}[ht]
 \centering
@@ -417,33 +458,46 @@ test $P_0⋅S_0 ≤_m Q_0⋅S_0$.
   \begin{minipage}[b]{.45\textwidth}
     \includegraphics{bench_wide_flat_rules.pdf}
   \end{minipage}
-  \caption{Benchmark for mvPDA with high branching degree}
-  \label{fig:bench-high-branching}
+  \caption{Benchmark for mvPDA with high local branching}
+  \label{fig:bench-high-local-branching}
 \end{figure}
 
-\paragraph{Trees with high global width}
+\paragraph{Constant local branching}
+
+For this family,
+we want to restrict the branching degree from any single state.
+Figure \ref{fig:mvpda-const-local-branching} defines an mvPDA where from
+each state at most two rules are applicable.
+From $P_0⋅S$ we perform $n$ call transitions, one internal and transitions
+and $n$ return transitions.
+These can all be matched by a rule from $Q_0⋅S$, whith each $Q_i⋅S$
+reachable after $n$ transitions for for $0 ≤ i ≤ n$.
+This again leads to an attack rule with a linearly sized right-hand side.
 
 \begin{figure}[ht]
   \centering
   \begin{minipage}[b]{.45\textwidth}
     \begin{align*}
-      P_{1,i}⋅S &\may[c] P_{1,i + 1}⋅S⋅S && ∀ 0 ≤ i < n \\
-      P_{1,n}⋅S &\may[i] P_{2,n}⋅S \\
-      P_{2,i + 1}⋅S &\may[r] P_{2,i} && ∀ 0 ≤ i < n \\
-      P_{2,0}⋅S &\may[i] P_{3,0} \text{if }¬ref \\
+      P_i⋅S &\may[c] P_{i + 1}⋅S⋅S && ∀ 0 ≤ i < n \\
+      P_n⋅S &\may[i] R_n⋅S \\
+      R_{i + 1}⋅S &\may[r] R_i && ∀ 0 ≤ i < n \\
+      R_0⋅S &\may[i] P_0⋅S && \text{if }¬ref
     \end{align*}
   \end{minipage}\quad
   \begin{minipage}[b]{.45\textwidth}
     \begin{align*}
-      Q_{1,i}⋅S &\may[c] Q_{1,i}⋅S⋅S && ∀ 0 ≤ i < n \\
-      Q_{1,i}⋅S &\may[c] Q_{1,i + 1}⋅S⋅S && ∀ 0 ≤ i < n \\
-      Q_{1,i}⋅S &\may[i] Q_{2,i}⋅S && ∀ 0 ≤ i < n \\
-      Q_{2,i}⋅S &\may[r] Q_{3,i} && ∀ 0 ≤ i < n
+      Q_i⋅S &\may[c] Q_i⋅S⋅S && ∀ 0 ≤ i < n \\
+      Q_i⋅S &\may[c] Q_{i + 1}⋅S⋅S && ∀ 0 ≤ i < n \\
+      Q_i⋅S &\may[i] T_i⋅S && ∀ 0 ≤ i < n \\
+      T_i⋅S &\may[r] T_i && ∀ 0 ≤ i < n
     \end{align*}
   \end{minipage}
-  \caption{mvPDA with high maximum width tree}
-  \label{fig:mvpda-max-width}
+  \caption{mvPDA with constant local branching}
+  \label{fig:mvpda-const-local-branching}
 \end{figure}
+
+Figure \ref{fig:bench-const-local-branching} shows the runtime and rules benchmark
+on this mvPDA and again there is an exponential growth. 
 
 \begin{figure}[ht] % TODO redo benchmark
 \centering
@@ -454,39 +508,49 @@ test $P_0⋅S_0 ≤_m Q_0⋅S_0$.
   \begin{minipage}[b]{.45\textwidth}
     \includegraphics{bench_wide_deep_rules.pdf}
   \end{minipage}
-  \caption{Benchmark for mvPDA with high maximum width tree}
-  \label{fig:bench-max-width}
+  \caption{Benchmark for mvPDA with constant local branching}
+  \label{fig:bench-const-local-branching}
 \end{figure}
 
-\paragraph{Trees with constant maximum width}
+\paragraph{Constant global branching}
 
-no significant differences between
-refining and non-refining processes.
+Next we restrict the global branching degree, that
+is the maximum width of any attack tree generated.
+For that we introduce a fixed parameter $k$.
+Figure \ref{fig:mvpda-const-global-branching} defines
+as mvPDA as a variation of the mvPDA from figure \ref{fig:mvpda-const-local-branching},
+except here there are only $\mathcal O(k)$ different states reachable from $Q_0⋅S$.
 
 \begin{figure}[ht]
   \centering
   \begin{minipage}[b]{.45\textwidth}
     \begin{align*}
-      P_{1,i}⋅S &\may[c] P_{1,i}⋅S⋅S && ∀ 0 ≤ i < n \\
-      P_{1,i}⋅S &\may[c] P_{1,i + 1}⋅S⋅S && ∀ 0 ≤ i < n \\
-      P_{1,n}⋅S &\may[i] P_{2,n}⋅S \\
-      P_{2,i + 1}⋅S &\may[r] P_{2,i} && ∀ 0 ≤ i < n \\
-      P_{2,n}⋅S &\may[i] P_{3,0}⋅S \text{if }¬ref \\
+      P_i⋅S &\may[c] P_{i + 1}⋅S⋅S && ∀ 0 ≤ i < n \\
+      P_n⋅S &\may[i] R_n⋅S \\
+      R_{i + 1}⋅S &\may[r] R_i && ∀ 0 ≤ i < n \\
+      R_0⋅S &\may[i] P_0⋅S && \text{if }¬ref
     \end{align*}
   \end{minipage}\quad
   \begin{minipage}[b]{.45\textwidth}
     \begin{align*}
-      Q_{1,i}⋅S &\may[c] Q_{1,i}⋅S⋅S && ∀ 0 ≤ i < k \\
-      Q_{1,i}⋅S &\may[c] Q_{1,i + 1}⋅S⋅S && ∀ 0 ≤ i < k \\
-      Q_{1,i}⋅S &\may[i] Q_{2,i}⋅S && ∀ 0 ≤ i < k \\
-      Q_{2,i}⋅S &\may[r] Q_{3,i} && ∀ 0 ≤ i < k
+      Q_i⋅S &\may[c] Q_i⋅S⋅S && ∀ 0 ≤ i < k \\
+      Q_i⋅S &\may[c] Q_{i + 1}⋅S⋅S && ∀ 0 ≤ i < k \\
+      Q_i⋅S &\may[i] T_i⋅S && ∀ 0 ≤ i < k \\
+      T_i⋅S &\may[r] T_i && ∀ 0 ≤ i < k
     \end{align*}
   \end{minipage}
-  \caption{mvPDA with constant maximum width tree}
-  \label{fig:mvpda-const}
+  \caption{mvPDA with constant global branching}
+  \label{fig:mvpda-const-global-branching}
 \end{figure}
 
-\begin{figure}[ht] % TODO redo benchmark
+The results of this benchmark are shown in figure \ref{fig:bench-const-global-branching}
+for a number of $k$.
+As there were no significant differences between the refining and non-refining
+version, only the refining one is shown.
+This time we get linear growth with the regard to $n$, while
+the multiplacative constant is exponential with regard to $k$.
+
+\begin{figure}[ht]
 \centering
   \begin{minipage}[b]{.45\textwidth}
     \includegraphics{bench_const_deep_time.pdf}
@@ -495,7 +559,73 @@ refining and non-refining processes.
   \begin{minipage}[b]{.45\textwidth}
     \includegraphics{bench_const_deep_rules.pdf}
   \end{minipage}
-  \caption{Benchmark for mvPDA with constant maximum width tree}
-  \label{fig:bench-const}
+  \caption{Benchmark for mvPDA with constant global branching}
+  \label{fig:bench-const-global-branching}
 \end{figure}
+
+\paragraph{Branching in attacking process}
+
+Now we modify the construction from figure \ref{fig:mvpda-const-global-branching}
+and add branching in the attacking process, while keeping branching in the
+defending process constant. The construction is shown in figure
+\ref{fig:mvpda-attacking-branching}.
+
+\begin{figure}[ht]
+  \centering
+  \begin{minipage}[b]{.45\textwidth}
+    \begin{align*}
+      P_i⋅S &\may[c] P_i⋅S⋅S && ∀ 0 ≤ i < n \\
+      P_i⋅S &\may[c] P_{i + 1}⋅S⋅S && ∀ 0 ≤ i < n \\
+      P_n⋅S &\may[i] R_n⋅S \\
+      R_{i + 1}⋅S &\may[r] R_i && ∀ 0 ≤ i < n \\
+      R_0⋅S &\may[i] P_0⋅S && \text{if }¬ref
+    \end{align*}
+  \end{minipage}\quad
+  \begin{minipage}[b]{.45\textwidth}
+    \begin{align*}
+      Q_i⋅S &\may[c] Q_i⋅S⋅S && ∀ 0 ≤ i < k \\
+      Q_i⋅S &\may[c] Q_{i + 1}⋅S⋅S && ∀ 0 ≤ i < k \\
+      Q_i⋅S &\may[i] T_i⋅S && ∀ 0 ≤ i < k \\
+      T_i⋅S &\may[r] T_i && ∀ 0 ≤ i < k \\
+    \end{align*}
+  \end{minipage}
+  \caption{mvPDA with branching in attacking process}
+  \label{fig:mvpda-attacking-branching}
+\end{figure}
+
+The results of this benchmark are shown in figure \ref{fig:bench-attacking-branching}.
+Surprisingly, the runtime is polynomial when $k ≤ 3$ and exponential for $k > 3$.
+The exponential growth comes from a combination of branching rules from both
+sides, leading to attack rules a right-hand of size $\mathcal O(nk)$ and runtime
+in $2^{\mathcal O(nk)}$.
+For $k ≤ 3$, some analysis showed that the combination heuristic could avoid
+the exponential growth.
+
+\begin{figure}[ht]
+\centering
+  \begin{minipage}[b]{.45\textwidth}
+    \includegraphics{bench_const_branch_time.pdf}
+  \end{minipage}
+  \hspace{0.5cm}
+  \begin{minipage}[b]{.45\textwidth}
+    \includegraphics{bench_const_branch_rules.pdf}
+  \end{minipage}
+  \caption{Benchmark for mvPDA with branching in attacking process}
+  \label{fig:bench-attacking-branching}
+\end{figure}
+
+\paragraph{Discussion}
+
+The results from the benchmarks show that branching, either on the attacking
+and defending side, can lead to exponential runtime in $2^{\mathcal Ω(n)}$.
+This can happen even if the local branching degree is constant.
+Branching on both sides even leads to a runtime in $2^{\mathcal Ω(n^2)}$.
+If the global branching can be kept constant, however, the runtime is
+polynomial.
+
+Further, different orders in which rules are combined can also cause
+a change in the runtime. While these are dependant on the input,
+there still could be a better heuristic that works better on most inputs.
+However, this should be tested on real-world data, of which there is not
+much available so far.
 
