@@ -4,14 +4,14 @@
 
 \chapter{Introduction}
 
-As an extension to labelled transitions systems,
+As an extension to labelled transition systems,
 modal transition systems (MTS) \cite{LarsenT88}
 have been widely used, especially in model checking.
 They provide a way to describe systems specifications
 in a way that allows stepwise refinement
 and composition of several refinements.
 
-An MTS has two transitions, \emph{may} transitions, which are admissible,
+An MTS has two types of transitions, \emph{may} transitions, which are admissible,
 and \emph{must} transitions, which are necessary.
 A refinement of an MTS should then keep all still be able to perform
 all must transitions and all transitions it can perform are may transitions.
@@ -31,7 +31,7 @@ and their respective modal transitions systems such as
 mPDA or mPN.
 
 Unfortunately, even for basic classes such as
-stateless PDA, known as binary process algebras (BPA), already simulation is
+stateless PDA, known as basic process algebras (BPA), already simulation is
 undecidable \cite{GrooteH94}.
 As refinement is a generalization of both simulation and bisimulation,
 it is also undecidable on mBPAs and mPDAs.

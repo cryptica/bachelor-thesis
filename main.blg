@@ -22,45 +22,45 @@ Warning--I'm ignoring KumarMV07's extra "booktitle" field
 --line 263 of file main.bib
 Warning--I'm ignoring AlurEM04's extra "booktitle" field
 --line 285 of file main.bib
-You've used 12 entries,
+You've used 13 entries,
             2624 wiz_defined-function locations,
-            666 strings with 6809 characters,
-and the built_in function-call counts, 5586 in all, are:
-= -- 540
-> -- 225
-< -- 8
-+ -- 72
-- -- 70
-* -- 425
-:= -- 846
-add.period$ -- 12
-call.type$ -- 12
-change.case$ -- 72
-chr.to.int$ -- 12
-cite$ -- 12
-duplicate$ -- 260
-empty$ -- 444
-format.name$ -- 87
-if$ -- 1201
+            673 strings with 6907 characters,
+and the built_in function-call counts, 5912 in all, are:
+= -- 572
+> -- 233
+< -- 9
++ -- 74
+- -- 72
+* -- 453
+:= -- 895
+add.period$ -- 13
+call.type$ -- 13
+change.case$ -- 77
+chr.to.int$ -- 13
+cite$ -- 13
+duplicate$ -- 275
+empty$ -- 473
+format.name$ -- 91
+if$ -- 1267
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 22
-newline$ -- 46
-num.names$ -- 44
-pop$ -- 83
+missing$ -- 24
+newline$ -- 49
+num.names$ -- 47
+pop$ -- 89
 preamble$ -- 1
-purify$ -- 82
+purify$ -- 88
 quote$ -- 0
-skip$ -- 227
+skip$ -- 237
 stack$ -- 0
-substring$ -- 376
-swap$ -- 74
-text.length$ -- 8
-text.prefix$ -- 5
+substring$ -- 402
+swap$ -- 75
+text.length$ -- 9
+text.prefix$ -- 6
 top$ -- 0
-type$ -- 96
+type$ -- 104
 warning$ -- 0
-while$ -- 59
+while$ -- 63
 width$ -- 16
-write$ -- 148
+write$ -- 158
 (There were 5 warnings)

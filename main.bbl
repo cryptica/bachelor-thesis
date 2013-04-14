@@ -61,4 +61,8 @@ Jir{\'i} Srba, \emph{Visibly pushdown automata: From language equivalence to
 Martin Stoll, \emph{Motras : A tool for modal transition systems}, Bachelor's
   thesis, Technische Universität München, 2011.
 
+\bibitem[Wal96]{Walukiewicz96}
+I.~Walukiewicz, \emph{Pushdown processes: games and model checking}, Lecture
+  Notes in Computer Science \textbf{1102} (1996), 62--75.
+
 \end{thebibliography}
