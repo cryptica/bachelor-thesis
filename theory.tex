@@ -4,8 +4,8 @@
 
 As a unified formalism to describe many classes of infinite state systems,
 process rewrite systems were introduced by \cite{Mayr00}.
-They specify rewrite rules on processes, which states of the systems.
-The syntax here on processes is taken from \cite{Esparza01}.
+They specify rewrite rules on processes as the states of the system.
+The syntax here is taken from \cite{Esparza01}.
 
 % processes are parallel or sequential
 
@@ -59,17 +59,7 @@ uppercase letters $P,Q,…$ will denote single process constants.
 
 \section{Modal transition system}
 
-%Modal transition systems are an extension of labeled transition systems
-%with two types of transitions, may and must transitions.
-%The intuition behind MTS is that in an refining system of an MTS,
-%all must transitions have to be present,
-%while the may transitions are allowed but not required.
-%Modal transitions systems \cite{LarsenT88, BenesKLS09, BenesK12} extend
-%labelled transition system with two types of transitions, may and must transitions.
-%The idea is that a refinement of system must keep any must transitions,
-%while it may only have may transitions present in the original system.
-
-Modal transitions systems and subsequently modal refinement are defined here as in \cite{BenesK12}.
+Modal transition systems and subsequently modal refinement are defined here as in \cite{BenesK12}.
 
 \begin{definition}[Modal transition system]
 A \emph{modal transition system (MTS)} over an action alphabet $Act = \{a, b, …\}$ is
@@ -80,9 +70,9 @@ and an element $(p,a,q) ∈ \must[]$ is a \emph{must transition}, written as $p 
 \end{definition}
 
 When using the term of a process in the context of an MTS,
-we will have its meaning include the underlying transition system,
-That way we can talk about refinement of a process by another process,
-without mentioning their originating systems.
+we will have its meaning include the underlying transition system.
+That way we can talk about refinement of a process by another process
+in the context of their originating systems.
 
 \section{Modal refinement}
 
@@ -104,7 +94,7 @@ Modal refinement of processes from two different MTS can be reduced to this by t
 the disjoint union of the MTS.
 
 The intuition for a process $p$ refining another process $q$ is that
-$p$ is a more specific than $q$, while $q$ on the contrary
+$p$ is more specific than $q$, while $q$
 is more abstract than $p$.
 Modal refinement can then be used to compare different specifications
 of a system or to obtain an \emph{implementation}, that is
@@ -135,7 +125,7 @@ defending transition. The complete characterization for this is given in \cite{B
 
 \section{Modal process rewrite system}
 
-Modal transitions systems are defined here as
+Modal process rewrite systems are defined here as
 a straightforward extension of
 process rewrite systems \cite{Mayr00, Esparza01},
 with their modal subclasses defined analogously.
@@ -205,7 +195,7 @@ We will have a look at the concepts introduced so far in an example.
   They should only be offered after inserting coins, although that is optional.
   However after inserting a number of coins, the machine either has to offer
   one tea for each coin inserted or one coffee for each coin inserted.
-  It may also offer, but does not need to.
+  It may also offer the other type of beverage, but does not need to.
   Then we obtain a proposed implementation and want to test if it refines
   the specification.
   
@@ -266,7 +256,7 @@ We will have a look at the concepts introduced so far in an example.
   transitions from the resulting state $(T,Q)$, therefore $T⋅M ≤_m Q⋅T$ holds.
 
   On the other hand, $C⋅M ≤_m Q⋅T$ does not hold, as from $Q⋅T$ there is the transition
-  $Q⋅T \may[tea] T$, but there is no transition of the form $C⋅M \may[tea] p'$.
+  $Q⋅T \must[tea] T$, but there is no transition of the form $C⋅M \must[tea] p'$.
 
   The main problem is to decide whether $P⋅S ≤_m Q⋅S$ holds. It is not easy to see
   if it does from the rules directly.
@@ -310,8 +300,8 @@ or fully explored strategies. These can then be used to decide refinement.
   
   Rules 1 and 2 construct an initial tree for an attacking transition with edges to
   states for each possible defending transitions,
-  while rule 3 replaces an open edge to a state with a tree having that state as its
-  root.
+  while rule 3 replaces an open edge to a state with a tree having that state as the
+  label of its root.
 
   As we can see from the construction rules, every node in a tree
   has a corresponding attacking transition, while for each edge from that node
@@ -325,7 +315,7 @@ or fully explored strategies. These can then be used to decide refinement.
   including $T$ itself, is given recursively by
   $subtree(T) = T ∪ \left(⋃_{T' ∈ T_C} subtree(T') \right)$.
   
-  The set of all \emph{open states} of $T$ are the states $(p',q')$ that
+  The set of all \emph{open states} of $T$ are the child states that
   have an open edge to it, that is $open(T) = ⋃_{T' ∈ subtree(T)} T'_O$
   or equivalently $open(T) = T_O ∪ \left(⋃_{T' ∈ T_C} open(T') \right)$.
   
@@ -334,7 +324,7 @@ or fully explored strategies. These can then be used to decide refinement.
 \end{definition}
 
 The construction rules for attack trees only allow us to add a tree
-to the root node as a subtree if there is an open edge.
+as a subtree from an open state in the root node.
 However, the following lemma shows that any open states in the tree
 can be replaced by a matching tree.
 
@@ -362,7 +352,7 @@ can be replaced by a matching tree.
       with an open edge to $R_r$, so we can apply
       the induction hypothesis to obtain
       $S'$ with $S'_r = T'_r$ and
-      $open(S') = open(T') ∖ \{R_r\} ∪ open(R)$
+      $open(S') = open(T') ∖ \{R_r\} ∪ open(R)$.
 
       As $T'$ was added to $T_C$ some point in the construction of $T$,
       we can substitute $T'$ with $S'$ at that point and obtain
@@ -434,7 +424,7 @@ of the refinement relation.
 \begin{example}
   For the MTS induced by the vending machine mvPDA from figure \ref{fig:vending-mvpda},
   attack trees for certain states are displayed in figure \ref{fig:vending-attack-trees}.
-  These are obtained by the basic rules 1 and 3.
+  These are obtained by the basic rules 1 and 2.
   Tree nodes are displayed in rectangles with their associated attacking transition
   below them, edges are labeled with their defending transitions and
   open states are shown in rectangles with rounded corners.
@@ -512,7 +502,7 @@ of the refinement relation.
   \node[label, left of=T5] {$T_5$:};
   
   \node[state, below of=T5, node distance=2cm] (T6) {$(T⋅M⋅S,Q⋅T⋅S)$};
-  \node[attack, below of=T6] {$Q⋅C \must[tea] Q $};
+  \node[attack, below of=T6] {$Q⋅T \must[tea] Q $};
   \node[label, left of=T6] {$T_6$:};
   
   \node[state, right of=T6, node distance=9cm] (T7) {$(T⋅M⋅S,Q⋅C⋅S)$};
@@ -591,7 +581,7 @@ for the corresponding MTS.
   
   When the rules 3 and 4 combine a rule $(p,q) \attack S \uplus \{(p',q')\}$
   on the left and a rule $(p',q') \attack S'$ on the right, it always holds that
-  $|p'| = 2$ or $|p'|$ = 3 and for all $(p'',q'') ∈ S'$ $|p''| = 1$.
+  $|p'| = 2$ or $|p'|$ = 3 and for all $(p'',q'') ∈ S'$ that $|p''| = 1$.
   A rule $p \attack S$ is then a \emph{right-hand side} rule if
   $∀(p',q') ∈ S: |p'| = 1$ and otherwise a \emph{left-hand side} rule.
   This partitions the set of rules into two classes.
@@ -636,8 +626,8 @@ attack trees are induced.
 Also from the rewrite rules, the attack rules are induced.
 The missing connection is from attack rules to attack trees, which we need
 to close.
-For that, first we need show that the relation between transitions
-and lifted versions of the transitions is linear for an mvPDA.
+For that, first we need show that there is a direct relation between transitions
+and lifted versions of the transitions for an mvPDA.
 
 \begin{lemma}
   \label{lemma:rule-lift}
@@ -654,7 +644,7 @@ and lifted versions of the transitions is linear for an mvPDA.
   
   \Leftarrow: In the inference chain for $p⋅s \may[a] p'⋅s$,
   there is a $(r,a,r') ∈ \Dmay$ which was used to obtain that rule
-  with $p⋅s = r⋅s'$ and $p'⋅s = r'⋅s'$. As $|r| ≤ |p|$, $|r'| ≤ |p'$ and $p,p',r,r'$ are all
+  with $p⋅s = r⋅s'$ and $p'⋅s = r'⋅s'$. As $|r| ≤ |p|$, $|r'| ≤ |p'|$ and $p,p',r,r'$ are all
   sequential, there is $s''$ with $p = r⋅s''$ and $p' = r⋅s''$.
   Then we can infer the transition $r⋅s'' \may[a] r'⋅s'' = p \may[a] p'$.
   The same holds for $q⋅t \must[a] q'⋅t$.
@@ -674,8 +664,8 @@ with added processes.
 \begin{proof}
   In each base case in the construction of $T$, the
   attacking transition can be lifted with $s$ or $t$.
-  For each defending transition, there is exactly one lifted
-  transition by lemma \ref{lemma:rule-lift}.
+  For each defending transition, by lemma 
+  \ref{lemma:rule-lift} there is exactly one lifted transition.
   Each other construction rule can still be applied on the
   lifted trees and we obtain the tree $R$.
 \end{proof}
@@ -723,33 +713,35 @@ using attack rules.
   \]
 \end{theorem}
 \begin{proof}
-    \Rightarrow: Assume $T$ to be closed tree with $T_r = (P⋅S,Q⋅R)$.
+    \Rightarrow: Assume $T$ to be a closed tree with $T_r = (P⋅S,Q⋅R)$.
 
       First we show that if there is a partition $\mathbb P = \{T'_1, …, T'_n\}$
       of $T$ with $n$ elements
       such that each part is represented by an attack rule, then
-      there is an attack rule $(P⋅S, Q⋅T) \attack ∅$
+      there is an attack rule $(P⋅S, Q⋅T) \attack ∅$.
       This is shown by induction on $n$:
       
       \begin{enumerate}
         \item $n = 1$: Then $P = \{T\}$ and there is a rule $(p,q) \attack S$
           representing $T$. As $(p⋅s,q⋅t) = T_r = (P⋅T,Q⋅R)$ and $|p| = |q| = 2$,
-          As $(p,q) = (P⋅T,Q⋅R)$ and $succ_{\mathbb P}(T) = ∅$ it follows that $S = ∅$.
+          necessarily $(p,q) = (P⋅T,Q⋅R)$ and as $succ_{\mathbb P}(T) = ∅$ it follows
+          that $S = ∅$.
           Then the rule is $(P⋅T, Q⋅R) \attack ∅$.
         \item $n > 1$:
           For $T$ as the root part in $\mathbb P$,
           there is $T' ∈ succ_{\mathbb P}(T)$ as $n > 1$
-          Let $T'_r = (p',q')$ and $a = (P⋅S,Q⋅R) \attack S$ be the rule representing $T$.
+          Let $T'_r = (p',q')$ and $(P⋅S,Q⋅R) \attack S$ be the rule representing $T$.
           We have $(p',q') ∈ S$ and necessarily $|p'| = |q'| ≥ 2$, as otherwise
           there would be no transition applicable from that state and
-          therefore $T''$ would not exist. So $a$ is a left-hand side rule.
+          therefore $T''$ would not exist. So the rule is a left-hand side rule.
 
           For every part $T'' ∈ {\mathbb P}$ with $succ_{\mathbb P}(T'') = ∅$,
-          the representing rule $b = (p,q) \rightarrow S$ has $S = ∅$,
+          the representing rule $(p,q) \rightarrow S$ has $S = ∅$,
           so it is a right-hand side rule.
           Every path in $\mathbb P$ eventually leads to such a part.
 
-          Then by following the successors of the parts from $T$,
+          Then by following the successors of the parts from $T$ along the
+          edges with $|p'| ≥ 2$ for the representing rule,
           eventually there will be a part $T'$ with a successor part $T''$ such that
           the rule representing $T'$ is a left-hand side rule and
           the rule representing $T''$ is a right-hand side rule.

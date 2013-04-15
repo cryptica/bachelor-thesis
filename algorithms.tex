@@ -1,6 +1,6 @@
 \chapter{The refinement algorithm}
 
-The given theory then lead to the development of a program
+The given theory then lead to the development of a program,
 implementing an algorithm for solving the refinement problem on mvPDA.
 This program should eventually be integrated into the MoTraS tool
 for modal transitions systems \cite{Stoll11}.
@@ -13,7 +13,7 @@ The basic idea of the algorithm is computing the set of all
 attack rules for a given mvPDA, by which it can decide refinement.
 Here the parts of the program are described as well as
 some finer implementation details, the basic usage and
-the performance results of several benchmarks is shown.
+the performance results of several benchmarks are shown.
 
 \section{Implementation}
 
@@ -93,11 +93,11 @@ rule from the initial state is contained in the rules.
 \end{figure}
 
 The function {\scfont{makeRules}} shown in figure \ref{alg:make-rules}
-takes an mvPDA as input and rules and returns the attack rules
+takes an mvPDA as input and returns the attack rules
 that can be constructed out of the rewrite rules in the mvPDA.
 This is basically the implementation of the inference rules 1 and 2
 for attack rules. For each state $(P⋅S,Q⋅T$) and each possible attack rewrite rule,
-the right-hand side is created by collecting the new states for all
+the right-hand side is created by collecting the new states for all appropriate
 defending rewrite rules.
 
 The function {\scfont{combine}} shown in figure \ref{alg:make-rules}
@@ -109,8 +109,6 @@ not, simply the empty set is returned.
 Otherwise all combinations allowed by the inference rules 3 and 4
 are formed and returned.
 
-% TODO some more
-
 \section{Soundness and completeness}
 
 As the algorithm constructs exactly all the attack rules
@@ -121,7 +119,7 @@ For an input mvPDA with the refinement problem $P⋅S \stackrel{?}{≤}_m Q⋅T$
 if the algorithm returns \textbf{true},
 then $P⋅S ≤_m Q⋅T$ holds, and if
 if the algorithm returns \textbf{false},
-then $(P⋅S ≤_m Q⋅T)$ does not hold.
+then $P⋅S ≤_m Q⋅T$ does not hold.
 
 For completeness only termination needs to be shown.
 The algorithm never adds a rule twice to its set of rules, and each iteration
@@ -143,14 +141,14 @@ $\mathcal O\left(k^4 2^{k^6}\right)$.
 The main loop of the algorithm is executed at most once for every possible rules.
 Its body can iterate over every rule created so far a constant amount of times,
 each time taking time polynomial with regard to the size of a single rule.
-An input of size $n$ can define $k ∈ \mathcal O(n)$ constants, therefore the worst-case
+An input of size $n$ can define $\mathcal O(n)$ constants, therefore the worst-case
 complexity is $\mathcal O\left( \left( n^4 2^{n^6} \right)^c\right) =
 \mathcal O\left( n^{4c} 2^{c \cdot n^6} \right) =
 \mathcal 2^{\mathcal O(n^6)} ⊆ \text{EXPTIME}$ for some constant $c ≥ 1$.
 The refinement problem on mvPDA is also EXPTIME-complete, as shown in \cite{BenesK12}.
 
 However the exponent could still be reduced. 
-A similar problem in \cite{Walukiewicz96} suggest $2^{\mathcal O(n^2}$,
+A similar problem in \cite{Walukiewicz96} suggests $2^{\mathcal O(n^2)}$,
 and testing implied that actually $O\left(k^3\right)$ rules are necessary
 to construct $k^6$ different right-hand sides from a state. Still this remains to be shown.
 Further for many types inputs where the global branching degree is constant
@@ -173,7 +171,7 @@ Newly obtained rules are then added to the worklist again.
 
 \paragraph{Hash map lookup}
 
-Also finding a matching rule, iterating over all rules can take exponential time.
+Also for finding a matching rule, iterating over all rules can take exponential time.
 A better approach is to separate the rules into left-hand side rules and right-hand side
 rules, and for each state $(P⋅S,Q⋅T)$, keep a reference to all rules of each type
 that apply from that state.
@@ -195,13 +193,10 @@ On the other hand, if there is no sequence that reduces $S'$,
 then there is also no sequence that reduces $S$.
 Therefore the correctness of the algorithm is not affected.
 
-%\paragraph{Removing rules that are not useful}
-% TODO
-
 \paragraph{Heuristic for combining rules}
 
 With the optimization to only keep minimal rules, these should be obtained
-as early as possible. While finding the optimal strategy is as hard,
+as early as possible. While finding the optimal strategy is hard,
 a suitable heuristic is to choose rules $(p,q) \attack S$ with the smallest
 $S$ first.
 This strategy works especially for non-refining process, where there are rules
@@ -211,19 +206,19 @@ For the implementation, this means using a priority queue as the worklist.
 \paragraph{Reachable state exploration}
 
 Instead of initialising the set of rules with rules from all possible states,
-only rules reachable from the initial state are added.
+only rules from states reachable from the initial state are added.
 Reachability is decidable on PDA \cite{BouajjaniEM97} and that can be applied to
 the combined states of the attack rules.
 The initialization starts with rules from the initial state
 and whenever a new state is obtained on the right-hand
-side as an internal or call state, the basic attack rules from that state are added.
+side, the basic attack rules from that state are added.
 This also reduces the added complexity of combining two mvPDA with no shared states
 into a single mvPDA.
 
 \paragraph{Early stopping}
 
-Instead of computing all possible rules and then testing if the empty is obtained,
-the algorithm can stop and return \textbf{false} as soon as it finds $(P⋅S,Q⋅T) \attack ∅$.
+The algorithm can stop and return \textbf{false} as soon as it finds $(P⋅S,Q⋅T) \attack ∅$
+and avoid computing all possible rules.
 However, this only improves the runtime if the processes do not refine.
 If they refine, the algorithm has to explore all the possible rules before
 returning \textbf{true}.
@@ -239,11 +234,6 @@ The optional switch \verb+-v+ turns on verbose mode, where each generated
 attack rule is printed to the output. This can be used for informative
 or debugging purposes.
 Otherwise simply the result of the refinement is shown.
-
-% TODO: verbosity?
-
-% TODO: how to call it
-% environment, java version, scala
 
 \subsection{Input}
 
@@ -334,8 +324,8 @@ figure \ref{fig:result-codes}.
   \begin{tabular}{l|l}
     Result code & Meaning \\
     \hline
-    {0} & The processes refine \\
-    {1} & The processes do not refine  \\
+    {0} & The processes do not refine \\
+    {1} & The processes refine  \\
     {E} & There was an exception
   \end{tabular}
   \caption{Result codes}
@@ -404,18 +394,18 @@ $P_0⋅S$ and the defending process $Q_0⋅S$.
 For the first family of mvPDA, a process is constructed
 that has a high branching degree from
 a single state. With the mvPDA
-defined in figure \ref{fig:mvpda-high-local-branching},
+defined as in figure \ref{fig:mvpda-high-local-branching},
 from $Q_0⋅S$ there are $n$ defending transitions applicable to the
-rule attacking transition $P_0⋅S \may[c] P_1⋅S⋅S$.
+attacking transition $P_0⋅S \may[c] P_1⋅S⋅S$.
 This will lead to an attack rule $(P_0⋅S,Q_0⋅S) \attack S'$ with $|S'| = n$.
-For each $(P_0⋅S⋅S, Q_0⋅S⋅S_i) ∈ S'$, there is a right-hand side
+For each $(P_0⋅S⋅S, Q_0⋅S⋅S_i) ∈ S'$, there is a right-hand side rule
 applicable and therefore an exponential number of possible rules.
 
 \begin{figure}[H]
   \centering
   \begin{minipage}[b]{.45\textwidth}
     \begin{align*}
-      P_0⋅S &\may[c] P_1⋅S⋅S \\ % TODO check again new S
+      P_0⋅S &\may[c] P_1⋅S⋅S \\
       P_0⋅S &\may[r] P_2 \\
       P_2⋅S &\may[c] P_3⋅S⋅S \\
       P_3⋅S &\may[i] P_4⋅S \\
@@ -563,7 +553,7 @@ the multiplicative constant is exponential with regard to $k$.
 \paragraph{Branching in attacking process}
 
 This family modifies the construction from figure \ref{fig:mvpda-const-global-branching}
-and add branching in the attacking process, while keeping branching in the
+and adds branching in the attacking process, while keeping branching in the
 defending process constant. The resulting construction is shown in figure
 \ref{fig:mvpda-attacking-branching}.
 
@@ -621,9 +611,9 @@ Branching on both sides even leads to a runtime in $2^{\mathcal Ω(n^2)}$.
 If the global branching can be kept constant, however, the runtime is
 polynomial.
 
-Further, different orders in which rules are combined can also cause
+Further, different orders in which the rules are combined can also cause
 a change in the runtime. While these are dependent on the input,
-there still could be a better heuristic that works better on most inputs.
+there still could be a heuristic that works better on most inputs.
 However, this should be tested on real-world data, of which there is not
 much available so far.
 
