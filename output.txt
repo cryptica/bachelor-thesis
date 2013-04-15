@@ -1,4 +1,4 @@
-$ java -jar mvpda-refinement.jar vendingmachine.mprs vpda.mprs non_vpda.mprs
-[0] src/main/resources/vendingmachine.mprs (0.293342559 s)
-[1] src/main/resources/vpda.mprs (7.682377187 s)
-[E] src/main/resources/non_vpda.mprs (java.lang.IllegalArgumentException: Given mPRS is not an mvPDA)
+$ java -jar mvpda-refinement.jar vending_machine.mprs vpda.mprs non_vpda.mprs 
+[0] vending_machine.mprs (0.097 s)
+[1] vpda.mprs (12.637 s)
+[E] non_vpda.mprs (java.lang.IllegalArgumentException: Given mPRS is not an mvPDA: action alphabet can not be partitioned)

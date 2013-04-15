@@ -1,3 +1,3 @@
 Philipp Meyer: Algorithms for refinement of modal process rewrite systems
 
-Farbseiten: 30-32
+Farbseiten: 31-33

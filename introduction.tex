@@ -4,7 +4,7 @@
 
 \chapter{Introduction}
 
-As an extension to labelled transition systems,
+As an extension to labeled transition systems,
 modal transition systems (MTS) \cite{LarsenT88}
 have been widely used, especially in model checking.
 They provide a way to describe system specifications
@@ -35,7 +35,7 @@ Unfortunately, even for basic classes such as
 stateless PDA, known as basic process algebras (BPA), already simulation is
 undecidable \cite{GrooteH94}.
 As refinement is a generalization of both simulation and bisimulation,
-it is also undecidable on mBPAs and mPDAs.
+it is also undecidable on mBPA and mPDA.
 
 However there is the subclass of visibly pushdown automata (vPDA),
 which is closed under all desirable operations
@@ -50,15 +50,15 @@ parenthesis-like matching in XML streaming
 and checking pre/post-conditions for module calls
 in program analysis \cite{AlurEM04}.
 
-Therefore we would like to use the modal view on vPDAs
-as well to allow modal specifcations and abstractions.
+Therefore we would like to use the modal view on vPDA
+as well to allow modal specifications and abstractions.
 This requires a way to test refinement between these.
 Fortunately, not only simulation and bisimulation
 is decidable \cite{Srba06},
 but also modal refinement \cite{BenesK12}.
 Based on that result, we present
 an algorithm with its underlying theory
-to decides modal refinement on mvPDAs.
+to decides modal refinement on mvPDA.
 
 
 

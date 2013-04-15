@@ -2,7 +2,7 @@
 
 \section{Main results}
 
-In this thesis, an algorithm for deciding refinement
+In this thesis, an algorithm for deciding modal refinement
 between modal visibly pushdown automata was presented.
 This was done by use of modal process rewrite systems
 and a new representation of refinement by attack trees.
@@ -15,27 +15,28 @@ complexity with theoretical bounds and a performance evaluation.
 This showed the unavoidable exponential runtime and
 conditions on input which produce or avoid it.
 
-This will hopefully contribute to the usage of mvPDAs
+This will hopefully contribute to the usage of mvPDA
 in the fields applying modal transitions systems, such as in
 system specifications and model checking, by providing
 a sound and complete way to test refinement.
 
 \section{Further extensions}
 
-Even with the exponential runtime, there are certainly
-more possible optimizations to improve the runtime.
+Even with the exponential runtime, there is certainly
+still room for more optimizations to improve the runtime.
 One possibility would be deciding positive refinement in certain cases before
 exploring the whole rule space, for example by showing that there are
 loops from each attack transition.
-It should also be possible to show that the worst-time complexity
-is always $2^{\mathcal O(n^2)}$ instead of $2^{\mathcal O(n^6)}$.
+It should also be possible reduce the worst-time complexity
+to $2^{\mathcal O(n^2)}$ instead of $2^{\mathcal O(n^6)}$.
 
-Further development in this area would then developing algorithms to
-decide refinement between other classes of mPRS where it is possible, for example
-between finite mFSM and general mPRS \cite{BenesK12}. Also there could be
-special treatment for mvBPA, for which the refinement is PTIME-complete.
+Further algorithms to decide 
+refinement between other classes of mPRS could be developed,
+at least where it is possible, for example
+between finite mFSM and general mPRS \cite{BenesK12}. Also there could be a
+specialized algorithm for mvBPA, for which the refinement is PTIME-complete.
 
-The tool should then be integrated into the MoTraS system to be made
+The tool also still needs to be integrated into the MoTraS system to be made
 available for end users. Then more options could be added, for example
 more verbose output such as optionally providing a counterexample
 in case of negative refinement.
